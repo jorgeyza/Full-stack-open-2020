@@ -1,0 +1,20 @@
+title exercise 0.6
+
+actor user
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/spa
+server-->browser:HTML-code
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+server-->browser:main.css
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/spa.js
+server-->browser:spa.js
+note over browser: browser starts executing js-code\nthat requests JSON data from server
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+server-->browser:[{ content: "HTML is easy", date: "2019-05-23" }, ...]
+note over browser: browser executes the event handler\nthat renders notes to display
+user->browser: Inputs a text("This is a new note") in the form\nand clicks on the button "Save"
+browser->server:HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+note over browser: browser executes event handler code when submitting the form.A new note\nis added to the notes array in the frontend, rerendered,and sent to the server\nin JSON format with the Content-type : application/json header
+note over server: server receives POST-request, accesses data in req.body,\ncreates new note object and pushes it into a notes array.\nFinally, sends a response with the status code 201 and an\nObject { message: "note created" }
+server-->browser:Response: { message:"note created" } && HTTP Headers { ..., Status code: 201, ... }
+
+Code used in https://www.websequencediagrams.com/

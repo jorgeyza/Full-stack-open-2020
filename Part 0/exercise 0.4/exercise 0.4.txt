@@ -1,0 +1,29 @@
+title exercise 0.4
+
+actor user
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/notes
+server-->browser:HTML-code
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+server-->browser:main.css
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+server-->browser:main.js
+note over browser: browser starts executing js-code\nthat requests JSON data from server
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+server-->browser:[{ content: "HTML is easy", date: "2019-05-23" }, ...]
+note over browser: browser executes the event handler\nthat renders notes to display
+user->browser: Inputs a text("This is a new note") in the form\nand clicks on the button "Save"
+browser->server:HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note
+note over server: server receives POST-request, accesses data in req.body,\ncreates new note object and pushes it into a notes array.\nFinally, sends a response that tells the browser to redirect \nto https://fullstack-exampleapp.herokuapp.com/notes
+browser->server:HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note
+server-->browser:Response: HTTP Headers {..., Status code: 302, Location: /notes, ...}
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/notes
+server-->browser:HTML-code
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+server-->browser:main.css
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+server-->browser:main.js
+browser->server:HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+server-->browser:[..., { content: "This is a new note", date: "2020-08-12" }, ...]
+note over browser: browser executes the event handler\nthat renders notes to display
+
+Code used in https://www.websequencediagrams.com/
