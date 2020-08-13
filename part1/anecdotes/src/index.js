@@ -4,7 +4,16 @@ import ReactDOM from "react-dom";
 const App = (props) => {
   const [selected, setSelected] = useState(0);
 
-  return <div>{props.anecdotes[selected]}</div>;
+  const handleClick = () => {
+    setSelected(Math.floor(Math.random() * 6));
+  };
+
+  return (
+    <div>
+      <h3>{props.anecdotes[selected]}</h3>
+      <button onClick={handleClick}>next anecdote</button>
+    </div>
+  );
 };
 
 const anecdotes = [
