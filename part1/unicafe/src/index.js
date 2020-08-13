@@ -8,6 +8,9 @@ const Statistics = (props) => {
       <p>good {props.good}</p>
       <p>neutral {props.neutral}</p>
       <p>bad {props.bad}</p>
+      <p>all {props.all}</p>
+      <p>average {props.average}</p>
+      <p>positive {props.positive}%</p>
     </div>
   );
 };
@@ -36,13 +39,24 @@ const App = () => {
     }
   };
 
+  let all = good + neutral + bad;
+  let average = (good * 1 + bad * -1) / all || 0;
+  let positive = (good / all) * 100 || 0;
+
   return (
     <div>
       <h1>give feedback</h1>
       <button onClick={() => handleClick("good")}>good</button>
       <button onClick={() => handleClick("neutral")}>neutral</button>
       <button onClick={() => handleClick("bad")}>bad</button>
-      <Statistics good={good} neutral={neutral} bad={bad} />
+      <Statistics
+        good={good}
+        neutral={neutral}
+        bad={bad}
+        all={all}
+        average={average}
+        positive={positive}
+      />
     </div>
   );
 };
