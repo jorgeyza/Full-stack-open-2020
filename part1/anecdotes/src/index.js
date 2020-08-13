@@ -4,7 +4,6 @@ import ReactDOM from "react-dom";
 const App = (props) => {
   const [selected, setSelected] = useState(0);
   const [points, setPoints] = useState(new Array(6).fill(0));
-  console.log("App -> points", points);
 
   const handleNext = () => {
     setSelected(Math.floor(Math.random() * 6));
@@ -14,8 +13,9 @@ const App = (props) => {
     const updatePoints = [...points];
     updatePoints[selected] += 1;
     setPoints(updatePoints);
-    console.log("handleVote -> updatePoints", updatePoints);
   };
+
+  let max = points.indexOf(Math.max(...points));
 
   return (
     <div>
@@ -23,6 +23,9 @@ const App = (props) => {
       <p>has {points[selected]} votes</p>
       <button onClick={handleVote}>vote</button>
       <button onClick={handleNext}>next anecdote</button>
+      <h1>Anecdote with most votes</h1>
+      <p>{props.anecdotes[max]}</p>
+      <p>has {points[max]} votes</p>
     </div>
   );
 };
