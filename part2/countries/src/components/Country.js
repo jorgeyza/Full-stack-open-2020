@@ -2,6 +2,7 @@ import React from "react";
 
 const Country = (props) => {
   const country = props.country[0];
+  console.log("Country -> country", country);
   return (
     <div>
       <h1>{country.name}</h1>

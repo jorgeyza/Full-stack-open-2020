@@ -8,10 +8,7 @@ const App = () => {
   const [countries, setCountries] = useState([]);
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [newFilter, setNewFilter] = useState("");
-
-  const handleFilter = (event) => {
-    setNewFilter(event.target.value);
-  };
+  const [showCountry, setShowCountry] = useState("");
 
   useEffect(() => {
     axios.get("https://restcountries.eu/rest/v2/all").then((response) => {
@@ -27,10 +24,23 @@ const App = () => {
     );
   }, [newFilter, countries]);
 
+  const handleFilter = (event) => {
+    setNewFilter(event.target.value);
+    setShowCountry("");
+  };
+
+  const handleShow = (name) => {
+    setShowCountry(name);
+  };
+
   return (
     <div>
       <Filter handleFilter={handleFilter} newFilter={newFilter} />
-      <Countries countries={filteredCountries} />
+      <Countries
+        countries={filteredCountries}
+        handleShow={handleShow}
+        showCountry={showCountry}
+      />
     </div>
   );
 };
