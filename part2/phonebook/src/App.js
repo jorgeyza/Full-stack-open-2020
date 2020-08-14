@@ -7,6 +7,10 @@ const App = () => {
 
   const handleAdd = (event) => {
     event.preventDefault();
+    let personDuplicated = persons.some((person) => person.name === newName);
+    if (personDuplicated) {
+      return alert(`${newName} is already added to phonebook`);
+    }
     setPersons(persons.concat({ name: newName }));
     setNewName("");
   };
