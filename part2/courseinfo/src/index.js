@@ -6,14 +6,10 @@ const Header = ({ course }) => {
 };
 
 const Total = ({ course }) => {
-  const sum =
-    course.parts[0].exercises +
-    course.parts[1].exercises +
-    course.parts[2].exercises +
-    course.parts[3].exercises;
+  const total = course.parts.reduce((sum, part) => (sum += part.exercises), 0);
   return (
     <p>
-      <strong>total of {sum} exercises</strong>
+      <strong>total of {total} exercises</strong>
     </p>
   );
 };
