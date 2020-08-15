@@ -3,6 +3,7 @@
 /.pnp
 .pnp.js
 part*/**/node_modules
+part*/**/.env
 
 # testing
 /coverage
