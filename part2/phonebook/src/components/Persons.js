@@ -1,7 +1,7 @@
 import React from "react";
 import Person from "./Person";
 
-const Persons = ({ persons, newFilter }) => {
+const Persons = ({ persons, newFilter, handleDelete }) => {
   return (
     <ul>
       {persons
@@ -9,7 +9,11 @@ const Persons = ({ persons, newFilter }) => {
           person.name.toLowerCase().includes(newFilter.toLowerCase())
         )
         .map((person) => (
-          <Person key={person.name} person={person} />
+          <Person
+            key={person.name}
+            person={person}
+            handleDelete={handleDelete}
+          />
         ))}
     </ul>
   );

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "./App.css";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import axiosHelper from "./services/axiosHelper";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,20 +12,64 @@ const App = () => {
   const [newFilter, setNewFilter] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
-    });
+    axiosHelper
+      .getAll()
+      .then((persons) => setPersons(persons))
+      .catch((error) => console.error(error));
   }, []);
 
-  const handleAdd = (event) => {
+  const handleAddAndUpdate = (event) => {
     event.preventDefault();
-    let personDuplicated = persons.some((person) => person.name === newName);
-    if (personDuplicated) {
-      return alert(`${newName} is already added to phonebook`);
+    const personDuplicatedIndex = persons.findIndex(
+      (person) => person.name === newName
+    );
+    const newPerson = { name: newName, number: newNumber };
+    if (personDuplicatedIndex !== -1) {
+      const result = window.confirm(
+        `${persons[personDuplicatedIndex].name} is already added to phonebook, replace the old number with a new one?`
+      );
+      if (result) {
+        return handleUpdateNumber(persons[personDuplicatedIndex].id, newPerson);
+      }
     }
-    setPersons(persons.concat({ name: newName, number: newNumber }));
-    setNewName("");
-    setNewNumber("");
+    axiosHelper
+      .create(newPerson)
+      .then((newPerson) => {
+        setPersons(persons.concat(newPerson));
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((error) => console.error(error));
+  };
+
+  const handleDelete = (id) => {
+    const personIndex = persons.findIndex((person) => person.id === id);
+    const result = window.confirm(`Delete ${persons[personIndex].name}?`);
+    if (result) {
+      axiosHelper
+        .deletePerson(id)
+        .then((response) =>
+          setPersons(persons.filter((person) => person.id !== id))
+        )
+        .catch((error) => console.error(error));
+    }
+  };
+
+  const handleUpdateNumber = (id, person) => {
+    axiosHelper
+      .update(id, person)
+      .then((updatedPerson) => {
+        const newList = persons.map((person) => {
+          if (person.id === id) {
+            return updatedPerson;
+          }
+          return person;
+        });
+        setPersons(newList);
+        setNewName("");
+        setNewNumber("");
+      })
+      .catch((error) => console.error(error));
   };
 
   const handleName = (event) => {
@@ -46,14 +90,18 @@ const App = () => {
       <Filter newFilter={newFilter} handleFilter={handleFilter} />
       <h3>add a new</h3>
       <PersonForm
-        handleAdd={handleAdd}
+        handleAddAndUpdate={handleAddAndUpdate}
         handleName={handleName}
         handleNumber={handleNumber}
         newName={newName}
         newNumber={newNumber}
       />
       <h3>Numbers</h3>
-      <Persons persons={persons} newFilter={newFilter} />
+      <Persons
+        persons={persons}
+        newFilter={newFilter}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 };
