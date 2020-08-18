@@ -1,4 +1,4 @@
-POST https://secret-falls-72090.herokuapp.com/
+POST https://secret-falls-72090.herokuapp.com/api/persons
 Content-Type: application/json
 
 {
