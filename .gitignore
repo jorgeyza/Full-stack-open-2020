@@ -9,7 +9,7 @@ part*/**/node_modules
 /coverage
 
 # production
-/build
+part*/**/build
 
 # misc
 .DS_Store
