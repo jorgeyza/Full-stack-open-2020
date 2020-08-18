@@ -1,4 +1,5 @@
 const express = require("express");
+const morgan = require("morgan");
 
 const app = express();
 
@@ -31,6 +32,16 @@ const generateId = () => {
   const id = Math.floor(Math.random() * 10000) + 1;
   return id;
 };
+
+morgan.token("body", function (req, res) {
+  return JSON.stringify(req.body);
+});
+app.use(
+  morgan(
+    ":method :url :status :req[content-length] - :response-time ms :body",
+    { skip: (req, res) => req.method !== "POST" }
+  )
+);
 
 app.get("/api/persons", (req, res) => {
   res.send(persons);
