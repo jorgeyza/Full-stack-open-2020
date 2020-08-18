@@ -1,0 +1,15 @@
+POST https://secret-falls-72090.herokuapp.com/
+Content-Type: application/json
+
+{
+  "name": "Liisa Marttinen",
+  "number": "040-243563"
+}
+
+# {
+#   "number": "123456"
+# }
+
+# {
+#   "name": "Test1"
+# }
