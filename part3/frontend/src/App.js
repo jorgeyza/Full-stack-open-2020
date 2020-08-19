@@ -4,7 +4,7 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import Notification from "./components/Notification";
-import axiosHelper from "./services/axiosHelper";
+import personService from "./services/personService";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -14,7 +14,7 @@ const App = () => {
   const [message, setMessage] = useState({ description: "", type: "" });
 
   useEffect(() => {
-    axiosHelper
+    personService
       .getAll()
       .then((persons) => setPersons(persons))
       .catch((error) => {
@@ -40,7 +40,7 @@ const App = () => {
         return handleUpdateNumber(persons[personDuplicatedIndex].id, newPerson);
       }
     }
-    axiosHelper
+    personService
       .create(newPerson)
       .then((newPerson) => {
         setPersons(persons.concat(newPerson));
@@ -52,7 +52,48 @@ const App = () => {
         }, 5000);
       })
       .catch((error) => {
-        setMessage({ description: "Could not add person", type: "error" });
+        if (error.response.data.includes("validation")) {
+          setMessage({ description: error.response.data, type: "error" });
+        } else {
+          setMessage({ description: "Could not add person", type: "error" });
+        }
+        console.error(error);
+        setTimeout(() => {
+          setMessage({ description: "", type: "" });
+        }, 5000);
+      });
+  };
+
+  const handleUpdateNumber = (id, person) => {
+    personService
+      .update(id, person)
+      .then((updatedPerson) => {
+        const newList = persons.map((p) => {
+          if (p.id === id) {
+            return updatedPerson;
+          }
+          return p;
+        });
+        setPersons(newList);
+        setNewName("");
+        setNewNumber("");
+        setMessage({
+          description: `Updated number of ${person.name}`,
+          type: "success",
+        });
+        setTimeout(() => {
+          setMessage({ description: "", type: "" });
+        }, 5000);
+      })
+      .catch((error) => {
+        if (error.response.data.includes("validation")) {
+          setMessage({ description: error.response.data, type: "error" });
+        } else {
+          setMessage({
+            description: `Could not update number of ${person.name}`,
+            type: "error",
+          });
+        }
         console.error(error);
         setTimeout(() => {
           setMessage({ description: "", type: "" });
@@ -64,7 +105,7 @@ const App = () => {
     const personIndex = persons.findIndex((person) => person.id === id);
     const result = window.confirm(`Delete ${persons[personIndex].name}?`);
     if (result) {
-      axiosHelper
+      personService
         .deletePerson(id)
         .then((response) => {
           setPersons(persons.filter((person) => person.id !== id));
@@ -88,39 +129,6 @@ const App = () => {
           setPersons(persons.filter((person) => person.id !== id));
         });
     }
-  };
-
-  const handleUpdateNumber = (id, person) => {
-    axiosHelper
-      .update(id, person)
-      .then((updatedPerson) => {
-        const newList = persons.map((p) => {
-          if (p.id === id) {
-            return updatedPerson;
-          }
-          return p;
-        });
-        setPersons(newList);
-        setNewName("");
-        setNewNumber("");
-        setMessage({
-          description: `Updated number of ${person.name}`,
-          type: "success",
-        });
-        setTimeout(() => {
-          setMessage({ description: "", type: "" });
-        }, 5000);
-      })
-      .catch((error) => {
-        setMessage({
-          description: `Could not update number of ${person.name}`,
-          type: "error",
-        });
-        console.error(error);
-        setTimeout(() => {
-          setMessage({ description: "", type: "" });
-        }, 5000);
-      });
   };
 
   const handleName = (event) => {
