@@ -1,6 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const mongoose = require("mongoose");
+const Person = require("./models/Person");
 
 const app = express();
 
@@ -32,11 +35,6 @@ let persons = [
   },
 ];
 
-const generateId = () => {
-  const id = Math.floor(Math.random() * 10000) + 1;
-  return id;
-};
-
 morgan.token("body", function (req, res) {
   return JSON.stringify(req.body);
 });
@@ -48,7 +46,9 @@ app.use(
 );
 
 app.get("/api/persons", (req, res) => {
-  res.send(persons);
+  Person.find({}).then((persons) => {
+    res.json(persons);
+  });
 });
 
 app.get("/info", (req, res) => {
@@ -59,38 +59,49 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
-    res.json(person);
-  } else {
-    res.status(404).end();
-  }
+  Person.findById(req.params.id)
+    .then((person) => {
+      if (person) {
+        res.json(person);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((error) => console.error("Could not fetch person", error.message));
 });
 
 app.post("/api/persons", (req, res) => {
   const body = req.body;
+  let person;
 
   if (!body.name || !body.number) {
     return res.status(400).json({
       error: "missing name or number",
     });
   }
-  const duplicatePerson = persons.some((person) => person.name === body.name);
-  if (duplicatePerson) {
-    return res.status(409).json({
-      error: "name must be unique",
-    });
-  }
 
-  const person = {
+  person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(),
-  };
+  });
 
-  persons = persons.concat(person);
-  return res.json(person);
+  person
+    .save()
+    .then((savedPerson) => res.json(savedPerson))
+    .catch((error) => console.error("Could not save person to db"));
+});
+
+app.put("/api/persons/:id", (req, res) => {
+  const body = req.body;
+  const id = req.params.id;
+  Person.findOne({ _id: id }).then((duplicatePerson) => {
+    duplicatePerson.number = body.number;
+    console.log("duplicatePerson changed number", duplicatePerson);
+    duplicatePerson
+      .save()
+      .then((savedPerson) => res.json(savedPerson))
+      .catch((error) => console.error("Could not update person number"));
+  });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
