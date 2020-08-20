@@ -1,10 +1,12 @@
-import React from "react";
+import React from 'react';
 
 const Person = ({ person, handleDelete }) => {
   return (
     <li>
       {person.name} {person.number}
-      <button onClick={() => handleDelete(person.id)}>delete</button>
+      <button type="button" onClick={() => handleDelete(person.id)}>
+        delete
+      </button>
     </li>
   );
 };

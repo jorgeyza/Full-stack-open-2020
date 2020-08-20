@@ -1,30 +1,67 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
-import Filter from "./components/Filter";
-import PersonForm from "./components/PersonForm";
-import Persons from "./components/Persons";
-import Notification from "./components/Notification";
-import personService from "./services/personService";
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import Filter from './components/Filter';
+import PersonForm from './components/PersonForm';
+import Persons from './components/Persons';
+import Notification from './components/Notification';
+import personService from './services/personService';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const [newFilter, setNewFilter] = useState("");
-  const [message, setMessage] = useState({ description: "", type: "" });
+  const [newName, setNewName] = useState('');
+  const [newNumber, setNewNumber] = useState('');
+  const [newFilter, setNewFilter] = useState('');
+  const [message, setMessage] = useState({ description: '', type: '' });
 
   useEffect(() => {
     personService
       .getAll()
-      .then((persons) => setPersons(persons))
+      .then((people) => setPersons(people))
       .catch((error) => {
-        setMessage({ description: "Could not fetch persons", type: "error" });
+        setMessage({ description: 'Could not fetch persons', type: 'error' });
         console.error(error);
         setTimeout(() => {
-          setMessage({ description: "", type: "" });
+          setMessage({ description: '', type: '' });
         }, 5000);
       });
   }, []);
+
+  const handleUpdateNumber = (id, person) => {
+    personService
+      .update(id, person)
+      .then((updatedPerson) => {
+        const newList = persons.map((p) => {
+          if (p.id === id) {
+            return updatedPerson;
+          }
+          return p;
+        });
+        setPersons(newList);
+        setNewName('');
+        setNewNumber('');
+        setMessage({
+          description: `Updated number of ${person.name}`,
+          type: 'success',
+        });
+        return setTimeout(() => {
+          setMessage({ description: '', type: '' });
+        }, 5000);
+      })
+      .catch((error) => {
+        if (error.response.data.includes('validation')) {
+          setMessage({ description: error.response.data, type: 'error' });
+        } else {
+          setMessage({
+            description: `Could not update number of ${person.name}`,
+            type: 'error',
+          });
+        }
+        console.error(error);
+        setTimeout(() => {
+          setMessage({ description: '', type: '' });
+        }, 5000);
+      });
+  };
 
   const handleAddAndUpdate = (event) => {
     event.preventDefault();
@@ -40,63 +77,26 @@ const App = () => {
         return handleUpdateNumber(persons[personDuplicatedIndex].id, newPerson);
       }
     }
-    personService
+    return personService
       .create(newPerson)
-      .then((newPerson) => {
-        setPersons(persons.concat(newPerson));
-        setNewName("");
-        setNewNumber("");
-        setMessage({ description: `Added ${newPerson.name}`, type: "success" });
-        setTimeout(() => {
-          setMessage({ description: "", type: "" });
+      .then((person) => {
+        setPersons(persons.concat(person));
+        setNewName('');
+        setNewNumber('');
+        setMessage({ description: `Added ${person.name}`, type: 'success' });
+        return setTimeout(() => {
+          setMessage({ description: '', type: '' });
         }, 5000);
       })
       .catch((error) => {
-        if (error.response.data.includes("validation")) {
-          setMessage({ description: error.response.data, type: "error" });
+        if (error.response.data.includes('validation')) {
+          setMessage({ description: error.response.data, type: 'error' });
         } else {
-          setMessage({ description: "Could not add person", type: "error" });
+          setMessage({ description: 'Could not add person', type: 'error' });
         }
         console.error(error);
         setTimeout(() => {
-          setMessage({ description: "", type: "" });
-        }, 5000);
-      });
-  };
-
-  const handleUpdateNumber = (id, person) => {
-    personService
-      .update(id, person)
-      .then((updatedPerson) => {
-        const newList = persons.map((p) => {
-          if (p.id === id) {
-            return updatedPerson;
-          }
-          return p;
-        });
-        setPersons(newList);
-        setNewName("");
-        setNewNumber("");
-        setMessage({
-          description: `Updated number of ${person.name}`,
-          type: "success",
-        });
-        setTimeout(() => {
-          setMessage({ description: "", type: "" });
-        }, 5000);
-      })
-      .catch((error) => {
-        if (error.response.data.includes("validation")) {
-          setMessage({ description: error.response.data, type: "error" });
-        } else {
-          setMessage({
-            description: `Could not update number of ${person.name}`,
-            type: "error",
-          });
-        }
-        console.error(error);
-        setTimeout(() => {
-          setMessage({ description: "", type: "" });
+          setMessage({ description: '', type: '' });
         }, 5000);
       });
   };
@@ -107,24 +107,24 @@ const App = () => {
     if (result) {
       personService
         .deletePerson(id)
-        .then((response) => {
+        .then(() => {
           setPersons(persons.filter((person) => person.id !== id));
           setMessage({
             description: `Deleted ${persons[personIndex].name}`,
-            type: "success",
+            type: 'success',
           });
-          setTimeout(() => {
-            setMessage({ description: "", type: "" });
+          return setTimeout(() => {
+            setMessage({ description: '', type: '' });
           }, 5000);
         })
         .catch((error) => {
           setMessage({
             description: `Information of ${persons[personIndex].name} has already been removed from server`,
-            type: "error",
+            type: 'error',
           });
           console.error(error);
           setTimeout(() => {
-            setMessage({ description: "", type: "" });
+            setMessage({ description: '', type: '' });
           }, 5000);
           setPersons(persons.filter((person) => person.id !== id));
         });
