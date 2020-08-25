@@ -1,100 +1,48 @@
+const mongoose = require('mongoose');
+const supertest = require('supertest');
+const app = require('../app');
+const Blog = require('../models/blog');
 const listHelper = require('../utils/list_helper');
+const testHelper = require('./test_helper');
 
-const blogs = [
-  {
-    _id: '5a422a851b54a676234d17f7',
-    title: 'React patterns',
-    author: 'Michael Chan',
-    url: 'https://reactpatterns.com/',
-    likes: 7,
-    __v: 0,
-  },
-  {
-    _id: '5a422aa71b54a676234d17f8',
-    title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
-    url:
-      'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 5,
-    __v: 0,
-  },
-  {
-    _id: '5a422b3a1b54a676234d17f9',
-    title: 'Canonical string reduction',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
-    likes: 12,
-    __v: 0,
-  },
-  {
-    _id: '5a422b891b54a676234d17fa',
-    title: 'First class tests',
-    author: 'Robert C. Martin',
-    url:
-      'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
-    likes: 10,
-    __v: 0,
-  },
-  {
-    _id: '5a422ba71b54a676234d17fb',
-    title: 'TDD harms architecture',
-    author: 'Robert C. Martin',
-    url:
-      'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
-    likes: 0,
-    __v: 0,
-  },
-  {
-    _id: '5a422bc61b54a676234d17fc',
-    title: 'Type wars',
-    author: 'Robert C. Martin',
-    url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
-    likes: 2,
-    __v: 0,
-  },
-];
+const api = supertest(app);
 
-const listWithOneBlog = [
-  {
-    _id: '5a422aa71b54a676234d17f8',
-    title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
-    url:
-      'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 5,
-    __v: 0,
-  },
-];
+beforeEach(async () => {
+  await Blog.deleteMany({});
 
-const emptyList = [];
+  const promiseArray = testHelper.listOfBlogs.map((blog) =>
+    new Blog(blog).save()
+  );
+  await Promise.all(promiseArray);
+});
 
 test('dummy returns one', () => {
-  const result = listHelper.dummy(emptyList);
+  const result = listHelper.dummy(testHelper.emptyBlogList);
   expect(result).toBe(1);
 });
 
 describe('Total likes', () => {
   test('of empty list is zero', () => {
-    const result = listHelper.totalLikes(emptyList);
+    const result = listHelper.totalLikes(testHelper.emptyBlogList);
     expect(result).toBe(0);
   });
   test('when list has only one blog, equals the likes of that', () => {
-    const result = listHelper.totalLikes(listWithOneBlog);
+    const result = listHelper.totalLikes(testHelper.listWithOneBlog);
     expect(result).toBe(5);
   });
   test('of a bigger list is calculated right', () => {
-    const result = listHelper.totalLikes(blogs);
+    const result = listHelper.totalLikes(testHelper.listOfBlogs);
     expect(result).toBe(36);
   });
 });
 
 describe('Favorite blog', () => {
   test('of empty list is empty object', () => {
-    const result = listHelper.favoriteBlog(emptyList);
+    const result = listHelper.favoriteBlog(testHelper.emptyBlogList);
     expect(result).toEqual({});
   });
   test('when list has only one blog is that same blog', () => {
-    const result = listHelper.favoriteBlog(listWithOneBlog);
+    const result = listHelper.favoriteBlog(testHelper.listWithOneBlog);
     expect(result).toEqual({
       title: 'Go To Statement Considered Harmful',
       author: 'Edsger W. Dijkstra',
@@ -102,7 +50,7 @@ describe('Favorite blog', () => {
     });
   });
   test('of a bigger list is the one with the most likes', () => {
-    const result = listHelper.favoriteBlog(blogs);
+    const result = listHelper.favoriteBlog(testHelper.listOfBlogs);
     expect(result).toEqual({
       title: 'Canonical string reduction',
       author: 'Edsger W. Dijkstra',
@@ -113,18 +61,18 @@ describe('Favorite blog', () => {
 
 describe('Author with the most blogs', () => {
   test('of empty list is empty object', () => {
-    const result = listHelper.mostBlogs(emptyList);
+    const result = listHelper.mostBlogs(testHelper.emptyBlogList);
     expect(result).toEqual({});
   });
   test('when list has only one blog is the author of that blog', () => {
-    const result = listHelper.mostBlogs(listWithOneBlog);
+    const result = listHelper.mostBlogs(testHelper.listWithOneBlog);
     expect(result).toEqual({
       author: 'Edsger W. Dijkstra',
       blogs: 1,
     });
   });
   test('of a bigger list is the one with the most blogs', () => {
-    const result = listHelper.mostBlogs(blogs);
+    const result = listHelper.mostBlogs(testHelper.listOfBlogs);
     expect(result).toEqual({
       author: 'Robert C. Martin',
       blogs: 3,
@@ -132,23 +80,132 @@ describe('Author with the most blogs', () => {
   });
 });
 
-// describe('Author with the most likes', () => {
-//   test('of empty list is empty object', () => {
-//     const result = listHelper.mostLikes(emptyList);
-//     expect(result).toEqual({});
-//   });
-//   test('when list has only one blog is the author of that blog', () => {
-//     const result = listHelper.mostLikes(listWithOneBlog);
-//     expect(result).toEqual({
-//       author: 'Edsger W. Dijkstra',
-//       likes: 5,
-//     });
-//   });
-//   test('of a bigger list is the one with the most likes', () => {
-//     const result = listHelper.mostLikes(blogs);
-//     expect(result).toEqual({
-//       author: 'Edsger W. Dijkstra',
-//       likes: 17,
-//     });
-//   });
-// });
+describe('Author with the most likes', () => {
+  test('of empty list is empty object', () => {
+    const result = listHelper.mostLikes(testHelper.emptyBlogList);
+    expect(result).toEqual({});
+  });
+  test('when list has only one blog is the author of that blog', () => {
+    const result = listHelper.mostLikes(testHelper.listWithOneBlog);
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 5,
+    });
+  });
+  test('of a bigger list is the one with the most likes', () => {
+    const result = listHelper.mostLikes(testHelper.listOfBlogs);
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 17,
+    });
+  });
+});
+describe('All blogs', () => {
+  test('are returned as json', async () => {
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+
+    const response = await api.get('/api/blogs');
+
+    expect(response.body).toHaveLength(testHelper.listOfBlogs.length);
+  });
+
+  test('are fetched with the property "id" instead of "_id"', async () => {
+    const fetchedBlogs = await testHelper.blogsInDb();
+    expect(fetchedBlogs[0].id).toBeDefined();
+  });
+});
+
+describe('addition of a new blog', () => {
+  test('succeeds with valid blog data', async () => {
+    const { title, author, url, likes } = testHelper.listWithOneBlog[0];
+    const validBlog = { title, author, url, likes };
+    const response = await api
+      .post('/api/blogs')
+      .send(validBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const blogsAtEnd = await testHelper.blogsInDb();
+    expect(blogsAtEnd).toHaveLength(testHelper.listOfBlogs.length + 1);
+
+    const createdBlog = blogsAtEnd[blogsAtEnd.length - 1];
+    expect([createdBlog]).toContainEqual(response.body);
+  });
+
+  test('fails with status code 400 if data is invalid', async () => {
+    const invalidBlog = { author: 'Test Author' };
+    await api.post('/api/blogs').send(invalidBlog).expect(400);
+  });
+
+  test('succeeds even if the likes property is missing from the request, as it will default to the value 0', async () => {
+    const { title, author, url } = testHelper.listWithOneBlog[0];
+    const validBlog = { title, author, url };
+    const response = await api
+      .post('/api/blogs')
+      .send(validBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    expect(response.body.likes).toBe(0);
+  });
+});
+
+describe('update of a blog', () => {
+  test('succeeds with valid blog data', async () => {
+    const { title, author, url, likes } = testHelper.listWithOneBlog[0];
+    const validBlog = { title, author, url, likes };
+    const blogsAtStart = await testHelper.blogsInDb();
+    const blogToUpdate = blogsAtStart[0];
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(validBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const blogsAtEnd = await testHelper.blogsInDb();
+    expect(blogsAtEnd).toHaveLength(testHelper.listOfBlogs.length);
+    expect(blogsAtEnd[0]).toEqual(response.body);
+  });
+
+  test('fails with status code 400 if data is invalid', async () => {
+    const { author, likes } = testHelper.listWithOneBlog[0];
+    const invalidBlog = { author, likes };
+    const blogsAtStart = await testHelper.blogsInDb();
+    const blogToUpdate = blogsAtStart[0];
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(invalidBlog)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+  });
+});
+
+describe('deletion of a blog', () => {
+  test('succeeds with status code 204 if id is valid', async () => {
+    const blogsAtStart = await testHelper.blogsInDb();
+    const blogToDelete = blogsAtStart[0];
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+    const blogsAtEnd = await testHelper.blogsInDb();
+    expect(blogsAtEnd).toHaveLength(testHelper.listOfBlogs.length - 1);
+
+    const titles = blogsAtEnd.map((b) => b.title);
+    expect(titles).not.toContain(blogToDelete.title);
+  });
+  test('fails with status code 400 if id is not valid', async () => {
+    const blogsAtStart = await testHelper.blogsInDb();
+
+    await api.delete(`/api/blogs/${testHelper.nonExistingId}`).expect(400);
+    expect(blogsAtStart).toHaveLength(testHelper.listOfBlogs.length);
+  });
+});
+
+afterAll(async () => {
+  await mongoose.connection.close();
+});

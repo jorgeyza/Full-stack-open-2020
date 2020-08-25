@@ -12,3 +12,15 @@ Content-Type: application/json
   "url": "something.sfsdfdsd",
   "likes": 4
 }
+
+### Update a blog
+
+PUT http://localhost:3001/api/blogs/5f3ebfd43068dd4a106f845c
+Content-Type: application/json
+
+{
+  "title": "Another Test",
+  "author": "testssssss",
+  "url": "lalal.comfsdfs",
+  "likes": 4
+}

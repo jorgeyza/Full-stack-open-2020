@@ -52,27 +52,32 @@ const mostBlogs = (blogs) => {
   return result;
 };
 
-// const mostLikes = (blogs) => {
-//   if (blogs.length === 0) {
-//     return {};
-//   }
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) {
+    return {};
+  }
 
-//   const authorLikesArray = blogs.map((blog) => ({
-//     author: blog.author,
-//     likes: blog.likes,
-//   }));
+  const authorLikesArray = blogs.map((blog) => ({
+    author: blog.author,
+    likes: blog.likes,
+  }));
 
-//   const result = _(authorLikesArray)
-//     .groupBy('author')
-//     .map((author, key) => ({ author: key, likes: _.sumBy(author, 'likes') }));
+  const totalLikesPerAuthor = _(authorLikesArray)
+    .groupBy('author')
+    .map((objs, key) => ({
+      author: key,
+      likes: _.sumBy(objs, 'likes'),
+    }))
+    .value();
 
-//   authorLikesArray.forEach((object) => object.forEach((author) => {}));
-// };
+  const result = _(totalLikesPerAuthor).maxBy('likes');
+  return result;
+};
 
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
   mostBlogs,
-  // mostLikes,
+  mostLikes,
 };
