@@ -2,9 +2,9 @@
 GET http://localhost:3001/api/blogs
 
 ### Create new blog
-
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI1ZjQ0NzA2NzA3MTllOTMxZWMzYjIwNzkiLCJpYXQiOjE1OTgzNzI1NzN9.H8ZMry6WKnsyVJo3mFUjhIBcpgFndGAPXp8UohR6pkk
 
 {
   "title": "Another interesting blog",
