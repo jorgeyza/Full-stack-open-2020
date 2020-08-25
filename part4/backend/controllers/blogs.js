@@ -8,14 +8,9 @@ blogRouter.post('/', async (req, res) => {
 });
 
 blogRouter.get('/', async (req, res) => {
-  const blogs = await Blog.find({});
+  const blogs = await Blog.find({}).populate('users');
   return res.json(blogs);
 });
-
-// blogRouter.get('/:id', async (req, res) => {
-//   const blog = await Blog.findById(req.params.id);
-//   return res.json(blog);
-// });
 
 blogRouter.put('/:id', async (req, res) => {
   const { title, author, url, likes } = req.body;
