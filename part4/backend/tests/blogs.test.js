@@ -46,7 +46,7 @@ describe('Favorite blog', () => {
   test('when list has only one blog is that same blog', () => {
     const result = listHelper.favoriteBlog(testHelper.listWithOneBlog);
     expect(result).toEqual({
-      title: 'Go To Statement Considered Harmful',
+      title: 'A different blog',
       author: 'Edsger W. Dijkstra',
       likes: 5,
     });
@@ -121,11 +121,22 @@ describe('All blogs', () => {
 });
 
 describe('addition of a new blog', () => {
-  test('succeeds with valid blog data', async () => {
+  beforeEach(async () => {
+    await User.deleteMany({});
+
+    const passwordHash = await bcrypt.hash('somepassword', 10);
+    const user = new User({ username: 'root', passwordHash });
+
+    await user.save();
+  });
+
+  test('succeeds with valid blog data and authorization token', async () => {
     const { title, author, url, likes } = testHelper.listWithOneBlog[0];
     const validBlog = { title, author, url, likes };
+    const authResponse = await testHelper.loginUser();
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', `bearer ${authResponse.body.token}`)
       .send(validBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -134,20 +145,38 @@ describe('addition of a new blog', () => {
     expect(blogsAtEnd).toHaveLength(testHelper.listOfBlogs.length + 1);
 
     const createdBlog = blogsAtEnd[blogsAtEnd.length - 1];
+    createdBlog.user = response.body.user;
     expect([createdBlog]).toContainEqual(response.body);
+  });
+
+  test('fails with status code 401 with valid data but no token is provided', async () => {
+    const { title, author, url, likes } = testHelper.listWithOneBlog[0];
+    const validBlog = { title, author, url, likes };
+    await api
+      .post('/api/blogs')
+      .send(validBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/);
   });
 
   test('fails with status code 400 if data is invalid', async () => {
     const invalidBlog = { author: 'Test Author' };
-    await api.post('/api/blogs').send(invalidBlog).expect(400);
+    const authResponse = await testHelper.loginUser();
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${authResponse.body.token}`)
+      .send(invalidBlog)
+      .expect(400);
   });
 
   test('succeeds even if the likes property is missing from the request, as it will default to the value 0', async () => {
     const { title, author, url } = testHelper.listWithOneBlog[0];
     const validBlog = { title, author, url };
+    const authResponse = await testHelper.loginUser();
     const response = await api
       .post('/api/blogs')
       .send(validBlog)
+      .set('Authorization', `bearer ${authResponse.body.token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/);
 
@@ -188,22 +217,44 @@ describe('update of a blog', () => {
 });
 
 describe('deletion of a blog', () => {
-  test('succeeds with status code 204 if id is valid', async () => {
-    const blogsAtStart = await testHelper.blogsInDb();
-    const blogToDelete = blogsAtStart[0];
+  beforeEach(async () => {
+    await User.deleteMany({});
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+    const passwordHash = await bcrypt.hash('somepassword', 10);
+    const user = new User({ username: 'root', passwordHash });
+
+    await user.save();
+  });
+
+  test('succeeds with status code 204 if id is valid', async () => {
+    const { title, author, url, likes } = testHelper.listWithOneBlog[0];
+    const validBlog = { title, author, url, likes };
+    const authResponse = await testHelper.loginUser();
+    const response = await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${authResponse.body.token}`)
+      .send(validBlog);
+
+    await api
+      .delete(`/api/blogs/${response.body.id}`)
+      .set('Authorization', `bearer ${authResponse.body.token}`)
+      .expect(204);
 
     const blogsAtEnd = await testHelper.blogsInDb();
-    expect(blogsAtEnd).toHaveLength(testHelper.listOfBlogs.length - 1);
+    expect(blogsAtEnd).toHaveLength(testHelper.listOfBlogs.length);
 
     const titles = blogsAtEnd.map((b) => b.title);
-    expect(titles).not.toContain(blogToDelete.title);
+    expect(titles).not.toContain(response.body.title);
   });
+
   test('fails with status code 400 if id is not valid', async () => {
     const blogsAtStart = await testHelper.blogsInDb();
+    const authResponse = await testHelper.loginUser();
 
-    await api.delete(`/api/blogs/${testHelper.nonExistingId}`).expect(400);
+    await api
+      .delete(`/api/blogs/${testHelper.nonExistingId()}`)
+      .set('Authorization', `bearer ${authResponse.body.token}`)
+      .expect(400);
     expect(blogsAtStart).toHaveLength(testHelper.listOfBlogs.length);
   });
 });
@@ -212,15 +263,14 @@ describe('when there is initially one user in db', () => {
   beforeEach(async () => {
     await User.deleteMany({});
 
-    const passwordHash = await bcrypt.hash('somesecret', 10);
+    const passwordHash = await bcrypt.hash('somepassword', 10);
     const user = new User({ username: 'root', passwordHash });
 
     await user.save();
   });
 
-  test('creation succeeds with a fresh username', async () => {
+  test('creation of account succeeds with a fresh username', async () => {
     const usersAtStart = await testHelper.usersInDb();
-
     const newUser = {
       username: 'jorge',
       name: 'Jorge Eyzaguirre',
@@ -240,7 +290,7 @@ describe('when there is initially one user in db', () => {
     expect(usernames).toContain(newUser.username);
   });
 
-  test('creation fails with proper statuscode and message if username is already taken', async () => {
+  test('creation of account fails with proper statuscode and message if username is already taken', async () => {
     const usersAtStart = await testHelper.usersInDb();
 
     const newUser = {
@@ -261,7 +311,7 @@ describe('when there is initially one user in db', () => {
     expect(usersAtEnd).toHaveLength(usersAtStart.length);
   });
 
-  test('creation fails with invalid user data', async () => {
+  test('creation of account fails with invalid user data', async () => {
     const usersAtStart = await testHelper.usersInDb();
 
     const newUser = {

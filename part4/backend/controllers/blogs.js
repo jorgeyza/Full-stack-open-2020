@@ -40,8 +40,21 @@ blogRouter.put('/:id', async (req, res) => {
 });
 
 blogRouter.delete('/:id', async (req, res) => {
-  await Blog.findByIdAndRemove(req.params.id);
-  return res.status(204).end();
+  const decodedToken = jwt.verify(req.token, process.env.SECRET);
+  if (!req.token || !decodedToken.id) {
+    return res.status(401).json({ error: 'token missing or invalid' });
+  }
+
+  const blog = await Blog.findById(req.params.id);
+  const user = await User.findOne({ _id: decodedToken.id });
+  if (blog.user.toString() === decodedToken.id.toString()) {
+    const updatedBlogs = user.blogs.filter((b) => b._id === blog.id);
+    user.blogs = updatedBlogs;
+    await user.save();
+    await blog.deleteOne();
+    return res.status(204).end();
+  }
+  return res.status(403).json({ error: 'blog does not belong to user' });
 });
 
 module.exports = blogRouter;

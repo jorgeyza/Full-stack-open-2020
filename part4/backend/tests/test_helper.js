@@ -1,5 +1,11 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+const supertest = require('supertest');
+const bcrypt = require('bcrypt');
 const Blog = require('../models/blog');
 const User = require('../models/user');
+const app = require('../app');
+
+const api = supertest(app);
 
 const listOfBlogs = [
   {
@@ -58,7 +64,7 @@ const listOfBlogs = [
 const listWithOneBlog = [
   {
     _id: '5a422aa71b54a676234d17f8',
-    title: 'Go To Statement Considered Harmful',
+    title: 'A different blog',
     author: 'Edsger W. Dijkstra',
     url:
       'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
@@ -87,6 +93,22 @@ const nonExistingId = async () => {
   return blog._id.toString();
 };
 
+const loginUser = async () => {
+  const userCredentials = {
+    username: 'myHelperUser',
+    password: 'myHelperPassword',
+  };
+  const { username, password } = userCredentials;
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  const user = new User({ username, passwordHash });
+
+  await user.save();
+
+  const response = await api.post('/api/login').send(userCredentials);
+  return response;
+};
+
 module.exports = {
   listOfBlogs,
   listWithOneBlog,
@@ -94,4 +116,5 @@ module.exports = {
   nonExistingId,
   blogsInDb,
   usersInDb,
+  loginUser,
 };
