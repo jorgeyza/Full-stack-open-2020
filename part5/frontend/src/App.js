@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer, useRef } from 'react';
 import blogService from './services/blogs';
 import loginService from './services/login';
 import Blog from './components/Blog';
 import Login from './components/Login';
 import BlogForm from './components/BlogForm';
 import Message from './components/Message';
+import Togglable from './components/Togglable';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -29,10 +30,12 @@ const App = () => {
     }
   );
 
+  const blogFormRef = useRef();
+
   useEffect(() => {
     const fetchBlogs = async () => {
       const fetchedBlogs = await blogService.getAll();
-      setBlogs(fetchedBlogs);
+      setBlogs(fetchedBlogs.sort((b1, b2) => b2.likes - b1.likes));
     };
     fetchBlogs();
   }, []);
@@ -96,6 +99,7 @@ const App = () => {
       url: blogFormInput.newUrl,
     };
     try {
+      blogFormRef.current.toggleVisibility();
       const newBlog = await blogService.create(blogObject);
       setBlogs(blogs.concat(newBlog));
       setMessage({
@@ -115,6 +119,58 @@ const App = () => {
       setTimeout(() => {
         setMessage({ type: 'error', content: null });
       }, 5000);
+    }
+  };
+
+  const handleLike = async (id) => {
+    const blogIndex = blogs.findIndex((b) => b.id === id);
+    const udpatedBlog = {
+      ...blogs[blogIndex],
+      likes: blogs[blogIndex].likes + 1,
+    };
+    try {
+      await blogService.update(id, udpatedBlog);
+      setBlogs(blogs.map((b) => (b.id === id ? udpatedBlog : b)));
+      setMessage({
+        type: 'success',
+        content: `${udpatedBlog.title} blog liked`,
+      });
+      setTimeout(() => {
+        setMessage({ type: 'success', content: null });
+      }, 5000);
+    } catch (error) {
+      setMessage({ type: 'error', content: 'Could not increase likes' });
+      setTimeout(() => {
+        setMessage({ type: 'error', content: null });
+      }, 5000);
+    }
+  };
+
+  const handleBlogDelete = async (id) => {
+    const selectedBlog = blogs.find((b) => b.id === id);
+    if (
+      window.confirm(
+        `Remove blog ${selectedBlog.title} by ${selectedBlog.author}`
+      )
+    ) {
+      const updatedBlogsList = blogs.filter((b) => b.id !== id);
+      blogService.setToken(user.token);
+      try {
+        await blogService.remove(id);
+        setBlogs(updatedBlogsList);
+        setMessage({
+          type: 'success',
+          content: `${selectedBlog.title} blog deleted`,
+        });
+        setTimeout(() => {
+          setMessage({ type: 'success', content: null });
+        }, 5000);
+      } catch (error) {
+        setMessage({ type: 'error', content: 'Could not delete blog' });
+        setTimeout(() => {
+          setMessage({ type: 'error', content: null });
+        }, 5000);
+      }
     }
   };
 
@@ -138,16 +194,24 @@ const App = () => {
           logout
         </button>
       </p>
-      <BlogForm
-        newTitle={blogFormInput.newTitle}
-        newAuthor={blogFormInput.newAuthor}
-        newUrl={blogFormInput.newUrl}
-        handleInputChange={handleBlogFormInputChange}
-        handleAddBlog={handleAddBlog}
-      />
-
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+      <Togglable buttonLabel="new blog" ref={blogFormRef}>
+        <BlogForm
+          newTitle={blogFormInput.newTitle}
+          newAuthor={blogFormInput.newAuthor}
+          newUrl={blogFormInput.newUrl}
+          handleInputChange={handleBlogFormInputChange}
+          handleAddBlog={handleAddBlog}
+        />
+      </Togglable>
+      {blogs.map((b) => (
+        <Blog
+          key={b.id}
+          blog={b}
+          username={user.name}
+          userid={user.id}
+          handleLike={() => handleLike(b.id)}
+          handleBlogDelete={() => handleBlogDelete(b.id)}
+        />
       ))}
     </div>
   );
