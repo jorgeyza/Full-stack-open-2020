@@ -3,6 +3,7 @@ module.exports = {
     browser: true,
     node: true,
     es2020: true,
+    'jest/globals': true,
   },
   extends: [
     'airbnb',
@@ -18,7 +19,7 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: 'module',
   },
-  plugins: ['react', 'promise'],
+  plugins: ['react', 'promise', 'jest'],
   rules: {
     'no-underscore-dangle': ['error', { allow: ['_id', '__v'] }],
     'react/jsx-filename-extension': [
