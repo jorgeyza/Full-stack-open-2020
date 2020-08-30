@@ -25,8 +25,8 @@ const App = () => {
   const [loginInput, setLoginInput] = useReducer(
     (state, newState) => ({ ...state, ...newState }),
     {
-      username: 'jorgeyza',
-      password: '123456',
+      username: '',
+      password: '',
     }
   );
 
@@ -203,12 +203,13 @@ const App = () => {
           handleAddBlog={handleAddBlog}
         />
       </Togglable>
-      {blogs.map((b) => (
+      {blogs.map((b, i) => (
         <Blog
           key={b.id}
           blog={b}
           username={user.name}
           userid={user.id}
+          index={i}
           handleLike={() => handleLike(b.id)}
           handleBlogDelete={() => handleBlogDelete(b.id)}
         />

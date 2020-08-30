@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
-const Blog = ({ blog, username, userid, handleLike, handleBlogDelete }) => {
+const Blog = ({
+  blog,
+  username,
+  userid,
+  handleLike,
+  handleBlogDelete,
+  index,
+}) => {
   const [visible, setVisible] = useState(false);
 
   const blogStyle = {
@@ -28,7 +35,7 @@ const Blog = ({ blog, username, userid, handleLike, handleBlogDelete }) => {
   };
 
   return (
-    <div style={blogStyle} className="blog">
+    <div style={blogStyle} className="blog" id={`blog${index}`}>
       {blog.title} {blog.author}
       <button type="button" className="showHide" onClick={toggleVisibility}>
         {visible ? 'hide' : 'view'}
@@ -44,6 +51,7 @@ const Blog = ({ blog, username, userid, handleLike, handleBlogDelete }) => {
         <br />
         <span className="userName">{username}</span> <br />
         <button
+          id="remove"
           style={removeButtonStyle}
           type="button"
           onClick={handleBlogDelete}
@@ -65,6 +73,7 @@ Blog.propTypes = {
   }).isRequired,
   username: PropTypes.string.isRequired,
   userid: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
   handleLike: PropTypes.func.isRequired,
   handleBlogDelete: PropTypes.func.isRequired,
 };

@@ -42,7 +42,9 @@ const BlogForm = ({
             onChange={handleInputChange}
           />
         </label>
-        <button type="submit">create</button>
+        <button type="submit" id="create">
+          create
+        </button>
       </form>
     </div>
   );
