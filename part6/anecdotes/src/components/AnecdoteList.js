@@ -22,7 +22,6 @@ const AnecdoteList = () => {
     }
     return anecdote;
   });
-  // const filter = useSelector(({ filter }) => filter);
   anecdotes.sort((a1, a2) => a2.votes - a1.votes);
   const dispatch = useDispatch();
 
@@ -36,28 +35,14 @@ const AnecdoteList = () => {
 
   return (
     <ul>
-      {
-        // filter
-        //   ? anecdotes
-        //       .filter((a) => a.includes(filter))
-        //       .map((a) => (
-        //         <Anecdote
-        //           key={a.id}
-        //           content={a.content}
-        //           votes={a.votes}
-        //           handleVote={() => handleVote(a.id, a.content)}
-        //         />
-        //       ))
-        //   :
-        anecdotes.map((a) => (
-          <Anecdote
-            key={a.id}
-            content={a.content}
-            votes={a.votes}
-            handleVote={() => handleVote(a.id, a.content)}
-          />
-        ))
-      }
+      {anecdotes.map((a) => (
+        <Anecdote
+          key={a.id}
+          content={a.content}
+          votes={a.votes}
+          handleVote={() => handleVote(a.id, a.content)}
+        />
+      ))}
     </ul>
   );
 };
