@@ -2,7 +2,7 @@ const initialState = { message: '', show: false };
 
 const notificationReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'SET_MESSAGE':
+    case 'INIT_MESSAGE':
       return { message: action.data.message, show: true };
     case 'REMOVE_MESSAGE':
       return { message: '', show: false };
@@ -11,16 +11,27 @@ const notificationReducer = (state = initialState, action) => {
   }
 };
 
-export const setMessage = (message) => {
+export const initMessage = (message) => {
   return {
-    type: 'SET_MESSAGE',
+    type: 'INIT_MESSAGE',
     data: { message },
   };
 };
 
-export const removeMessage = () => {
-  return {
-    type: 'REMOVE_MESSAGE',
+export const removeMessage = (timeout) => {
+  return async (dispatch) => {
+    setTimeout(() => {
+      dispatch({
+        type: 'REMOVE_MESSAGE',
+      });
+    }, timeout);
+  };
+};
+
+export const setMessage = (message, timeout) => {
+  return async (dispatch) => {
+    dispatch(initMessage(message));
+    dispatch(removeMessage(timeout));
   };
 };
 
