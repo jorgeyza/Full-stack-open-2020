@@ -1,5 +1,7 @@
 const initialState = { message: '', show: false };
 
+let timedOutId;
+
 const notificationReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'INIT_MESSAGE':
@@ -18,20 +20,19 @@ export const initMessage = (message) => {
   };
 };
 
-export const removeMessage = (timeout) => {
-  return async (dispatch) => {
-    setTimeout(() => {
-      dispatch({
-        type: 'REMOVE_MESSAGE',
-      });
-    }, timeout);
+export const removeMessage = () => {
+  return {
+    type: 'REMOVE_MESSAGE',
   };
 };
 
 export const setMessage = (message, timeout) => {
   return async (dispatch) => {
     dispatch(initMessage(message));
-    dispatch(removeMessage(timeout));
+    clearTimeout(timedOutId);
+    timedOutId = setTimeout(() => {
+      dispatch(removeMessage());
+    }, timeout);
   };
 };
 
