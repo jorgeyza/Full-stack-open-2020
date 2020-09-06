@@ -6,7 +6,6 @@ let token = null;
 
 const setToken = (newToken) => {
   token = `bearer ${newToken}`;
-  return token;
 };
 
 const create = async (newObject) => {

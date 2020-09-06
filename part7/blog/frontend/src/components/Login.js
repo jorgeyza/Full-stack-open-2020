@@ -1,24 +1,48 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useReducer } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../reducers/userReducer';
+import { notify } from '../reducers/notificationReducer';
 import Message from './Message';
 
-const Login = ({
-  message,
-  username,
-  password,
-  handleInputChange,
-  handleLogin,
-}) => {
+const Login = () => {
+  const [loginInput, setLoginInput] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    {
+      username: '',
+      password: '',
+    }
+  );
+  const notificationSelector = useSelector(({ notification }) => notification);
+  const dispatch = useDispatch();
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setLoginInput({ [name]: value });
+  };
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      dispatch(loginUser(loginInput));
+      setLoginInput({ username: '', password: '' });
+      dispatch(
+        notify({ type: 'success', content: 'Successfully logged in' }, 5000)
+      );
+    } catch (error) {
+      dispatch(notify({ type: 'error', content: 'Wrong credentials' }, 5000));
+    }
+  };
+
   return (
     <div>
       <h2>log in to application</h2>
-      <Message message={message} />
+      <Message message={notificationSelector} />
       <form onSubmit={handleLogin}>
         <div>
           username
           <input
             type="text"
-            value={username}
+            value={loginInput.username}
             name="username"
             onChange={handleInputChange}
           />
@@ -27,7 +51,7 @@ const Login = ({
           password
           <input
             type="password"
-            value={password}
+            value={loginInput.password}
             name="password"
             onChange={handleInputChange}
           />
@@ -36,14 +60,6 @@ const Login = ({
       </form>
     </div>
   );
-};
-
-Login.propTypes = {
-  message: PropTypes.objectOf(PropTypes.string).isRequired,
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
-  handleInputChange: PropTypes.func.isRequired,
-  handleLogin: PropTypes.func.isRequired,
 };
 
 export default Login;
