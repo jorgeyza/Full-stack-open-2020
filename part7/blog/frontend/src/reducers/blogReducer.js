@@ -7,7 +7,6 @@ const blogReducer = (state = [], action) => {
     case 'CREATE_BLOG':
       return state.concat(action.data);
     case 'UPDATE_BLOG':
-      debugger;
       return state.map((b) =>
         b.id === action.data.id ? action.data.updatedBlog : b
       );
@@ -41,7 +40,6 @@ export const createBlog = (blogObject) => {
 export const updateBlog = (id, changedBlog) => {
   return async (dispatch) => {
     console.log('updateBlog -> id', id);
-    debugger;
     const updatedBlog = await blogService.update(id, changedBlog);
     console.log('updateBlog -> updatedBlog', updatedBlog);
     dispatch({

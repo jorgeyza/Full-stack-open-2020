@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../reducers/userReducer';
+import { loginUser } from '../reducers/loginReducer';
 import { notify } from '../reducers/notificationReducer';
 import Message from './Message';
 

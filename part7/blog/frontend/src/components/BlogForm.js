@@ -16,7 +16,7 @@ const BlogForm = ({ blogFormRef }) => {
     }
   );
   const dispatch = useDispatch();
-  const userSelector = useSelector(({ user }) => user);
+  const loginSelector = useSelector(({ login }) => login);
 
   const handleBlogFormInputChange = (event) => {
     const { name, value } = event.target;
@@ -32,7 +32,7 @@ const BlogForm = ({ blogFormRef }) => {
     };
     try {
       blogFormRef.current.toggleVisibility();
-      blogService.setToken(userSelector.token);
+      blogService.setToken(loginSelector.token);
       dispatch(createBlog(blogObject));
       dispatch(
         notify({
