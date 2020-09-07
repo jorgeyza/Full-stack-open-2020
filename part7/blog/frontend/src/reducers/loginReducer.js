@@ -12,10 +12,11 @@ const loginReducer = (state = null, action) => {
       return action.data;
     case 'LOGOUT_USER':
       return null;
-    case 'SET_LOGGED_USER':
+    case 'SET_LOGGED_USER': {
       const loggedUser = JSON.parse(action.data);
       blogService.setToken(loggedUser.token);
       return loggedUser;
+    }
     default:
       return state;
   }

@@ -30,6 +30,7 @@ const Blog = ({ blog, handleDeleteBlog, index }) => {
 
 Blog.propTypes = {
   blog: PropTypes.shape({
+    id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     author: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
@@ -38,7 +39,7 @@ Blog.propTypes = {
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       username: PropTypes.string.isRequired,
-      blogs: PropTypes.array,
+      blogs: PropTypes.arrayOf(PropTypes.object),
     }),
   }).isRequired,
   index: PropTypes.number.isRequired,

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Typography } from '@material-ui/core';
+import { Switch, Route } from 'react-router-dom';
 import { initializeBlogs } from './reducers/blogReducer';
 import { initializeUsers } from './reducers/userReducer';
 import { setLoggedUser } from './reducers/loginReducer';
-import { Switch, Route } from 'react-router-dom';
 import BlogsList from './components/BlogsList';
 import Login from './components/Login';
 import BlogForm from './components/BlogForm';
@@ -13,7 +14,6 @@ import UserDetail from './components/UserDetail';
 import UsersTable from './components/UsersTable';
 import Navigation from './components/Navigation';
 import BlogDetail from './components/BlogDetail';
-import { Typography } from '@material-ui/core';
 
 const App = () => {
   const loginSelector = useSelector(({ login }) => login);

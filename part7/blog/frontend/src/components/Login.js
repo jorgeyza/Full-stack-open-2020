@@ -1,9 +1,9 @@
 import React, { useReducer } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Button, TextField, Typography } from '@material-ui/core';
 import { loginUser } from '../reducers/loginReducer';
 import { notify } from '../reducers/notificationReducer';
 import Message from './Message';
-import { Button, TextField, Typography } from '@material-ui/core';
 
 const Login = () => {
   const [loginInput, setLoginInput] = useReducer(

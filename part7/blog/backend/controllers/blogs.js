@@ -21,6 +21,15 @@ blogRouter.post('/', async (req, res) => {
   return res.status(201).json(savedBlog);
 });
 
+blogRouter.post('/:id/comments', async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+
+  blog.comments = blog.comments.concat(req.body.comment);
+
+  const updatedBlog = await blog.save();
+  return res.status(201).json(updatedBlog);
+});
+
 blogRouter.get('/', async (req, res) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 });
   return res.json(blogs);

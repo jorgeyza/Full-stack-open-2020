@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { notify } from '../reducers/notificationReducer';
-import { addBlogComment } from '../reducers/blogReducer';
 import {
   Button,
   TextField,
@@ -10,6 +8,8 @@ import {
   Typography,
   ListItemText,
 } from '@material-ui/core';
+import { notify } from '../reducers/notificationReducer';
+import { addBlogComment } from '../reducers/blogReducer';
 
 const Comments = ({ blog }) => {
   const [commentInput, setCommentInput] = useState('');

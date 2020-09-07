@@ -1,9 +1,9 @@
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Button, AppBar, Toolbar, Typography } from '@material-ui/core';
 import { Link, useHistory } from 'react-router-dom';
 import { logoutUser } from '../reducers/loginReducer';
 import { notify } from '../reducers/notificationReducer';
-import { useSelector, useDispatch } from 'react-redux';
-import { Button, AppBar, Toolbar, Typography } from '@material-ui/core';
 
 const Navigation = () => {
   const loginSelector = useSelector(({ login }) => login);

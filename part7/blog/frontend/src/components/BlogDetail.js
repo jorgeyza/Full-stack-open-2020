@@ -1,27 +1,27 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { Button, Typography } from '@material-ui/core';
 import { updateBlog } from '../reducers/blogReducer';
 import { notify } from '../reducers/notificationReducer';
 import Comments from './Comments';
-import { Button, Typography } from '@material-ui/core';
 
 const BlogDetail = () => {
   const blogsSelector = useSelector(({ blog }) => blog);
   const dispatch = useDispatch();
-  const id = useParams().id;
-  const blog = blogsSelector.find((blog) => blog.id === id);
+  const { id } = useParams();
+  const blog = blogsSelector.find((b) => b.id === id);
   if (!blog) {
     return null;
   }
 
-  const handleLike = async (id) => {
+  const handleLike = async (blogId) => {
     const udpatedBlog = {
       ...blog,
       likes: blog.likes + 1,
     };
     try {
-      dispatch(updateBlog(id, udpatedBlog));
+      dispatch(updateBlog(blogId, udpatedBlog));
       dispatch(
         notify(
           {

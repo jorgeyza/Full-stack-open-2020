@@ -1,6 +1,5 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import UserRow from './UserRow';
 import {
   Table,
   TableHead,
@@ -10,6 +9,7 @@ import {
   Paper,
   Typography,
 } from '@material-ui/core';
+import UserRow from './UserRow';
 
 const UsersTable = () => {
   const userSelector = useSelector(({ user }) => user);
@@ -20,7 +20,7 @@ const UsersTable = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell></TableCell>
+              <TableCell />
               <TableCell>Blogs created</TableCell>
             </TableRow>
           </TableHead>

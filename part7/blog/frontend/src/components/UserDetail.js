@@ -5,8 +5,8 @@ import { Typography, List, ListItem, ListItemText } from '@material-ui/core';
 
 const UserDetail = () => {
   const usersSelector = useSelector(({ user }) => user);
-  const id = useParams().id;
-  const user = usersSelector.find((user) => user.id === id);
+  const { id } = useParams();
+  const user = usersSelector.find((u) => u.id === id);
   if (!user) {
     return null;
   }
