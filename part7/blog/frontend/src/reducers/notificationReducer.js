@@ -1,37 +1,39 @@
 const initialState = { content: null, type: null };
 
-let timedOutId;
-
 const notificationReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'INIT_NOTIFICATION':
+    case 'SET_NOTIFICATION':
       return { content: action.data.content, type: action.data.type };
-    case 'REMOVE_NOTIFICATION':
+    case 'CLEAR_NOTIFICATION':
       return { content: null, type: null };
     default:
       return state;
   }
 };
 
+let timedOutId;
+
 export const setNotification = (content, type) => {
   return {
-    type: 'INIT_NOTIFICATION',
+    type: 'SET_NOTIFICATION',
     data: { content, type },
   };
 };
 
-export const removeNotification = () => {
+export const clearNotification = () => {
   return {
-    type: 'REMOVE_NOTIFICATION',
+    type: 'CLEAR_NOTIFICATION',
   };
 };
 
 export const notify = ({ content, type }, timeout) => {
   return async (dispatch) => {
     dispatch(setNotification(content, type));
-    clearTimeout(timedOutId);
+    if (timedOutId) {
+      clearTimeout(timedOutId);
+    }
     timedOutId = setTimeout(() => {
-      dispatch(removeNotification());
+      dispatch(clearNotification());
     }, timeout);
   };
 };

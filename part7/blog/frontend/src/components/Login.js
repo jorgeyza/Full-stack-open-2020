@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../reducers/loginReducer';
 import { notify } from '../reducers/notificationReducer';
 import Message from './Message';
+import { Button, TextField, Typography } from '@material-ui/core';
 
 const Login = () => {
   const [loginInput, setLoginInput] = useReducer(
@@ -23,7 +24,7 @@ const Login = () => {
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      dispatch(loginUser(loginInput));
+      await dispatch(loginUser(loginInput));
       setLoginInput({ username: '', password: '' });
       dispatch(
         notify({ type: 'success', content: 'Successfully logged in' }, 5000)
@@ -35,28 +36,26 @@ const Login = () => {
 
   return (
     <div>
-      <h2>log in to application</h2>
+      <Typography variant="h2">Log in to application</Typography>
       <Message message={notificationSelector} />
       <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={loginInput.username}
-            name="username"
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={loginInput.password}
-            name="password"
-            onChange={handleInputChange}
-          />
-        </div>
-        <button type="submit">login</button>
+        <TextField
+          value={loginInput.username}
+          label="username"
+          name="username"
+          onChange={handleInputChange}
+        />
+        <TextField
+          style={{ marginLeft: 10 }}
+          type="password"
+          value={loginInput.password}
+          label="password"
+          name="password"
+          onChange={handleInputChange}
+        />
+        <Button style={{ marginLeft: 10 }} variant="outlined" type="submit">
+          login
+        </Button>
       </form>
     </div>
   );

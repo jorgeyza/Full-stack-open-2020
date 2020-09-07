@@ -1,16 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
+import Link from '@material-ui/core/Link';
+import { TableBody, TableRow, TableCell, Typography } from '@material-ui/core';
 
 const UserRow = ({ name, blogsQty, userid }) => {
   return (
-    <tbody>
-      <tr>
-        <td>
-          <Link to={`/users/${userid}`}>{name}</Link>
-        </td>
-        <td>{blogsQty}</td>
-      </tr>
-    </tbody>
+    <TableBody>
+      <TableRow>
+        <TableCell>
+          <Link component={RouterLink} to={`/users/${userid}`}>
+            <Typography>{name}</Typography>
+          </Link>
+        </TableCell>
+        <TableCell>
+          <Typography>{blogsQty}</Typography>
+        </TableCell>
+      </TableRow>
+    </TableBody>
   );
 };
 

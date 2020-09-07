@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { updateBlog } from '../reducers/blogReducer';
 import { notify } from '../reducers/notificationReducer';
+import Comments from './Comments';
+import { Button, Typography } from '@material-ui/core';
 
 const BlogDetail = () => {
   const blogsSelector = useSelector(({ blog }) => blog);
@@ -38,19 +40,29 @@ const BlogDetail = () => {
 
   return (
     <div>
-      <h2>{blog.title}</h2>
-      <span className="url">{blog.url}</span>
-      <br />
-      <span className="likes">likes: {blog.likes}</span>
-      <button
-        type="button"
-        className="likeButton"
-        onClick={() => handleLike(id)}
-      >
-        like
-      </button>
-      <br />
-      <span className="userName">{blog.author}</span> <br />
+      <Typography>
+        <b>Title:</b> {blog.title}
+      </Typography>
+      <Typography className="url">
+        <b>URL:</b> {blog.url}
+      </Typography>
+      <Typography className="likes">
+        <b>Likes:</b> {blog.likes}
+        <Button
+          style={{ marginLeft: 10 }}
+          color="primary"
+          variant="contained"
+          className="likeButton"
+          onClick={() => handleLike(id)}
+        >
+          LIKE
+        </Button>
+      </Typography>
+      <Typography className="userName">
+        <b>Author:</b>
+        {blog.author}
+      </Typography>
+      <Comments blog={blog} />
     </div>
   );
 };

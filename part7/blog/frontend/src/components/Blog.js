@@ -1,44 +1,30 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
+import Link from '@material-ui/core/Link';
+import { Button, ListItem } from '@material-ui/core';
 
 import PropTypes from 'prop-types';
 
 const Blog = ({ blog, handleDeleteBlog, index }) => {
   const loginSelector = useSelector(({ login }) => login);
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
-  const removeButtonStyle = {
-    backgroundColor: '#008CBA',
-    border: 'none',
-    color: 'white',
-  };
-
   return (
-    <li style={blogStyle} className="blog" id={`blog${index}`}>
-      <Link to={`/blogs/${blog.id}`}>
+    <ListItem className="blog" id={`blog${index}`}>
+      <Link component={RouterLink} to={`/blogs/${blog.id}`}>
         {blog.title} {blog.author}
       </Link>
-      <span>
-        {loginSelector.id === blog.user.id || loginSelector.id === blog.user ? (
-          <button
-            id="remove"
-            style={removeButtonStyle}
-            type="button"
-            onClick={handleDeleteBlog}
-          >
-            remove
-          </button>
-        ) : null}
-      </span>
-    </li>
+      {loginSelector.id === blog.user.id || loginSelector.id === blog.user ? (
+        <Button
+          style={{ marginLeft: 10 }}
+          variant="contained"
+          id="remove"
+          onClick={handleDeleteBlog}
+        >
+          remove
+        </Button>
+      ) : null}
+    </ListItem>
   );
 };
 

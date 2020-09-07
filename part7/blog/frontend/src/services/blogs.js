@@ -17,6 +17,15 @@ const create = async (newObject) => {
   return response.data;
 };
 
+const createBlogComment = async (id, newObject) => {
+  try {
+    const response = await axios.post(`${baseUrl}/${id}/comments`, newObject);
+    return response.data;
+  } catch (error) {
+    throw new Error('could not create blog comment');
+  }
+};
+
 const getAll = async () => {
   try {
     const response = await axios.get(baseUrl);
@@ -39,4 +48,4 @@ const remove = async (id) => {
   return response.data;
 };
 
-export default { getAll, setToken, create, update, remove };
+export default { getAll, setToken, create, createBlogComment, update, remove };

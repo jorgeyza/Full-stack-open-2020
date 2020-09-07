@@ -39,9 +39,7 @@ export const createBlog = (blogObject) => {
 
 export const updateBlog = (id, changedBlog) => {
   return async (dispatch) => {
-    console.log('updateBlog -> id', id);
     const updatedBlog = await blogService.update(id, changedBlog);
-    console.log('updateBlog -> updatedBlog', updatedBlog);
     dispatch({
       type: 'UPDATE_BLOG',
       data: { id, updatedBlog },
@@ -53,6 +51,13 @@ export const deleteBlog = (id) => {
   return async (dispatch) => {
     await blogService.remove(id);
     dispatch({ type: 'DELETE_BLOG', data: { id } });
+  };
+};
+
+export const addBlogComment = (id, comment) => {
+  return async (dispatch) => {
+    const updatedBlog = await blogService.createBlogComment(id, { comment });
+    dispatch({ type: 'UPDATE_BLOG', data: { id, updatedBlog } });
   };
 };
 

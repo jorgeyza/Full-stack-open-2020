@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { deleteBlog } from '../reducers/blogReducer';
 import { notify } from '../reducers/notificationReducer';
 import Blog from './Blog';
+import { List } from '@material-ui/core';
 
 const BlogsList = () => {
   const blogsSelector = useSelector(({ blog }) => blog);
@@ -35,7 +36,7 @@ const BlogsList = () => {
   };
 
   return (
-    <ul>
+    <List>
       {blogsSelector.map((b, i) => (
         <Blog
           key={b.id}
@@ -44,7 +45,7 @@ const BlogsList = () => {
           handleDeleteBlog={() => handleDeleteBlog(b.id)}
         />
       ))}
-    </ul>
+    </List>
   );
 };
 

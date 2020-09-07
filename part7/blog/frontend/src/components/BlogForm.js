@@ -3,8 +3,20 @@ import { useSelector, useDispatch } from 'react-redux';
 import { createBlog } from '../reducers/blogReducer';
 import { notify } from '../reducers/notificationReducer';
 import blogService from '../services/blogs';
+import { Button, TextField, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > *': {
+      margin: theme.spacing(1),
+      width: '25ch',
+    },
+  },
+}));
 
 const BlogForm = ({ blogFormRef }) => {
+  const classes = useStyles();
   const [blogFormInput, setBlogFormInput] = useReducer(
     (state, newState) => {
       return { ...state, ...newState };
@@ -33,13 +45,15 @@ const BlogForm = ({ blogFormRef }) => {
     try {
       blogFormRef.current.toggleVisibility();
       blogService.setToken(loginSelector.token);
-      dispatch(createBlog(blogObject));
+      await dispatch(createBlog(blogObject));
       dispatch(
-        notify({
-          type: 'success',
-          content: `a new blog ${blogFormInput.newTitle} by ${blogFormInput.newAuthor} added`,
-        }),
-        5000
+        notify(
+          {
+            type: 'success',
+            content: `a new blog ${blogFormInput.newTitle} by ${blogFormInput.newAuthor} added`,
+          },
+          5000
+        )
       );
       setBlogFormInput({
         newTitle: '',
@@ -53,41 +67,35 @@ const BlogForm = ({ blogFormRef }) => {
 
   return (
     <div>
-      <h2>create new</h2>
-      <form className="form" onSubmit={handleAddBlog}>
-        <label htmlFor="title">
-          title:
-          <input
-            type="text"
-            name="newTitle"
-            id="title"
-            value={blogFormInput.newTitle}
-            onChange={handleBlogFormInputChange}
-          />
-        </label>
-        <label htmlFor="author">
-          author:
-          <input
-            type="text"
-            name="newAuthor"
-            id="author"
-            value={blogFormInput.newAuthor}
-            onChange={handleBlogFormInputChange}
-          />
-        </label>
-        <label htmlFor="url">
-          url:
-          <input
-            type="text"
-            name="newUrl"
-            id="url"
-            value={blogFormInput.newUrl}
-            onChange={handleBlogFormInputChange}
-          />
-        </label>
-        <button type="submit" id="create">
+      <Typography variant="h4">Create new</Typography>
+      <form className={classes.root} onSubmit={handleAddBlog}>
+        <TextField
+          variant="outlined"
+          name="newTitle"
+          label="title*"
+          id="title"
+          value={blogFormInput.newTitle}
+          onChange={handleBlogFormInputChange}
+        />
+        <TextField
+          variant="outlined"
+          name="newAuthor"
+          label="author*"
+          id="author"
+          value={blogFormInput.newAuthor}
+          onChange={handleBlogFormInputChange}
+        />
+        <TextField
+          variant="outlined"
+          name="newUrl"
+          label="url*"
+          id="url"
+          value={blogFormInput.newUrl}
+          onChange={handleBlogFormInputChange}
+        />
+        <Button variant="contained" color="primary" type="submit" id="create">
           create
-        </button>
+        </Button>
       </form>
     </div>
   );

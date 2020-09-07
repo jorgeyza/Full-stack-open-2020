@@ -1,5 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { initializeBlogs } from './reducers/blogReducer';
+import { initializeUsers } from './reducers/userReducer';
+import { setLoggedUser } from './reducers/loginReducer';
+import { Switch, Route } from 'react-router-dom';
 import BlogsList from './components/BlogsList';
 import Login from './components/Login';
 import BlogForm from './components/BlogForm';
@@ -8,11 +12,8 @@ import Togglable from './components/Togglable';
 import UserDetail from './components/UserDetail';
 import UsersTable from './components/UsersTable';
 import Navigation from './components/Navigation';
-import { initializeBlogs } from './reducers/blogReducer';
-import { initializeUsers } from './reducers/userReducer';
-import { setLoggedUser } from './reducers/loginReducer';
-import { Switch, Route } from 'react-router-dom';
 import BlogDetail from './components/BlogDetail';
+import { Typography } from '@material-ui/core';
 
 const App = () => {
   const loginSelector = useSelector(({ login }) => login);
@@ -36,10 +37,10 @@ const App = () => {
   const loginForm = () => <Login message={notificationSelector} />;
 
   const blogsForm = () => (
-    <div>
+    <>
       <Navigation />
       <Message message={notificationSelector} />
-      <h2>blogs</h2>
+      <Typography variant="h2">Blog app</Typography>
       <Switch>
         <Route path="/users/:id">
           <UserDetail />
@@ -57,7 +58,7 @@ const App = () => {
           <BlogsList />
         </Route>
       </Switch>
-    </div>
+    </>
   );
 
   return <>{loginSelector ? blogsForm() : loginForm()}</>;

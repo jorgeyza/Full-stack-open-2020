@@ -3,6 +3,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { logoutUser } from '../reducers/loginReducer';
 import { notify } from '../reducers/notificationReducer';
 import { useSelector, useDispatch } from 'react-redux';
+import { Button, AppBar, Toolbar, Typography } from '@material-ui/core';
 
 const Navigation = () => {
   const loginSelector = useSelector(({ login }) => login);
@@ -19,20 +20,28 @@ const Navigation = () => {
   };
 
   return (
-    <nav style={{ display: 'flex', backgroundColor: 'lightgray' }}>
-      <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-        <li style={{ display: 'inline-block', padding: '0px 5px' }}>
-          <Link to="/">blogs</Link>
-        </li>
-        <li style={{ display: 'inline-block', padding: '0px 5px' }}>
-          <Link to="/users">users</Link>
-        </li>
-      </ul>
-      <span>{loginSelector.name} logged in</span>
-      <button style={{ marginLeft: 5 }} type="button" onClick={handleLogout}>
-        logout
-      </button>
-    </nav>
+    <AppBar position="static">
+      <Toolbar>
+        <Button color="inherit" component={Link} to="/">
+          Blogs
+        </Button>
+        <Button color="inherit" component={Link} to="/users">
+          Users
+        </Button>
+        <Typography>
+          <em>{loginSelector.name} logged in</em>
+        </Typography>
+        <Button
+          variant="outlined"
+          color="inherit"
+          style={{ marginLeft: 5 }}
+          type="button"
+          onClick={handleLogout}
+        >
+          logout
+        </Button>
+      </Toolbar>
+    </AppBar>
   );
 };
 
