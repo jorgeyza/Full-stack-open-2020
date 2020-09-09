@@ -1,72 +1,84 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { TextField, Button, Typography } from '@material-ui/core';
+import { CREATE_BOOK, ALL_BOOKS } from '../queries';
 
-const NewBook = (props) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuhtor] = useState('')
-  const [published, setPublished] = useState('')
-  const [genre, setGenre] = useState('')
-  const [genres, setGenres] = useState([])
+const NewBook = () => {
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [published, setPublished] = useState('');
+  const [genre, setGenre] = useState('');
+  const [genres, setGenres] = useState([]);
 
-  if (!props.show) {
-    return null
-  }
+  const [createBook] = useMutation(CREATE_BOOK, {
+    refetchQueries: [{ query: ALL_BOOKS }],
+  });
 
   const submit = async (event) => {
-    event.preventDefault()
-    
-    console.log('add book...')
+    event.preventDefault();
 
-    setTitle('')
-    setPublished('')
-    setAuhtor('')
-    setGenres([])
-    setGenre('')
-  }
+    createBook({
+      variables: { title, author, published: parseInt(published), genres },
+    });
+
+    setTitle('');
+    setPublished('');
+    setAuthor('');
+    setGenres([]);
+    setGenre('');
+  };
 
   const addGenre = () => {
-    setGenres(genres.concat(genre))
-    setGenre('')
-  }
+    setGenres(genres.concat(genre));
+    setGenre('');
+  };
 
   return (
     <div>
       <form onSubmit={submit}>
         <div>
-          title
-          <input
+          <TextField
             value={title}
+            variant="outlined"
+            label="title"
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
         <div>
-          author
-          <input
+          <TextField
             value={author}
-            onChange={({ target }) => setAuhtor(target.value)}
+            variant="outlined"
+            label="author"
+            onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>
-          published
-          <input
-            type='number'
+          <TextField
+            type="number"
             value={published}
+            variant="outlined"
+            label="published"
             onChange={({ target }) => setPublished(target.value)}
           />
         </div>
         <div>
-          <input
+          <TextField
             value={genre}
+            variant="outlined"
+            label="genre"
             onChange={({ target }) => setGenre(target.value)}
           />
-          <button onClick={addGenre} type="button">add genre</button>
+          <Button color="primary" onClick={addGenre} type="button">
+            Add genre
+          </Button>
         </div>
-        <div>
-          genres: {genres.join(' ')}
-        </div>
-        <button type='submit'>create book</button>
+        <Typography>genres: {genres.join(' ')}</Typography>
+        <Button color="primary" variant="contained" type="submit">
+          Create book
+        </Button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default NewBook
+export default NewBook;
