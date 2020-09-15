@@ -14,7 +14,7 @@ const NewBook = () => {
     refetchQueries: [{ query: ALL_BOOKS }],
   });
 
-  const submit = async (event) => {
+  const handleAddBook = async (event) => {
     event.preventDefault();
 
     createBook({
@@ -35,7 +35,7 @@ const NewBook = () => {
 
   return (
     <div>
-      <form onSubmit={submit}>
+      <form onSubmit={handleAddBook}>
         <div>
           <TextField
             value={title}
