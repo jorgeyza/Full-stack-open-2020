@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useApolloClient } from '@apollo/client';
+import { Switch, Route } from 'react-router-dom';
+import { Container, Typography, Box } from '@material-ui/core';
 import Authors from './components/Authors';
 import Books from './components/Books';
 import Login from './components/Login';
 import Notify from './components/Notify';
 import NewBook from './components/NewBook';
-import { Switch, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
-import { Container, Typography } from '@material-ui/core';
+import Recommended from './components/Recommended';
 
 const App = () => {
   const [token, setToken] = useState(null);
@@ -51,12 +52,18 @@ const App = () => {
         <Route path="/add-book">
           <NewBook />
         </Route>
+        <Route path="/recommend">
+          <Recommended />
+        </Route>
         <Route path="/">
           <Typography variant="h1" style={{ textAlign: 'center' }}>
             Library app{' '}
-            <span role="img" aria-label="books">
-              📕📗📘📙
-            </span>
+            {
+              // eslint-disable-next-line jsx-a11y/accessible-emoji
+              <Box component="span" role="img" aria-label="books">
+                📕📗📘📙
+              </Box>
+            }
           </Typography>
         </Route>
       </Switch>

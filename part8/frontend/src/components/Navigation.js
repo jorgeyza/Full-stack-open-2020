@@ -21,6 +21,9 @@ const Navigation = ({ token, handleLogout }) => {
             <Button color="inherit" component={Link} to="/add-book">
               Add book
             </Button>
+            <Button color="inherit" component={Link} to="/recommend">
+              Recommend
+            </Button>
             <Button color="inherit" onClick={handleLogout}>
               Logout
             </Button>
