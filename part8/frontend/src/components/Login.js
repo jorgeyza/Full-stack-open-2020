@@ -1,20 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { TextField, Button, Typography } from '@material-ui/core';
+import { NotificationContext } from '../context';
 import { LOGIN } from '../queries';
-import { useHistory } from 'react-router-dom';
 
-const Login = ({ setError, setToken }) => {
+const Login = ({ setToken }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const [login, result] = useMutation(LOGIN, {
     onError: (error) => {
-      setError(error.graphQLErrors[0].message);
+      addMessage(error.graphQLErrors[0].message, 'error');
+    },
+    onCompleted: (data) => {
+      addMessage('Successfully logged in', 'success');
     },
   });
 
   const history = useHistory();
+  const { addMessage } = useContext(NotificationContext);
 
   useEffect(() => {
     if (result.data) {
@@ -27,7 +32,6 @@ const Login = ({ setError, setToken }) => {
 
   const handleLogin = (event) => {
     event.preventDefault();
-
     login({ variables: { username, password } });
   };
 

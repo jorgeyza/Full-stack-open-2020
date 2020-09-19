@@ -1,23 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useMutation } from '@apollo/client';
 import { TextField, Button, Typography } from '@material-ui/core';
-import { CREATE_BOOK, ALL_BOOKS } from '../queries';
+import { NotificationContext } from '../context';
+import { CREATE_BOOK } from '../queries';
 
-const NewBook = () => {
+const NewBook = ({ updateCacheWith }) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [published, setPublished] = useState('');
   const [genre, setGenre] = useState('');
   const [genres, setGenres] = useState([]);
 
+  const { addMessage } = useContext(NotificationContext);
+
   const [createBook] = useMutation(CREATE_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }],
+    onError: (error) => {
+      addMessage(
+        error.graphQLErrors[0] ? error.graphQLErrors[0].message : error.message,
+        'error'
+      );
+    },
+    update: (store, response) => {
+      console.log('update executed');
+      updateCacheWith(response.data.createBook);
+    },
   });
 
   const handleAddBook = async (event) => {
     event.preventDefault();
 
-    createBook({
+    await createBook({
       variables: { title, author, published: parseInt(published), genres },
     });
 

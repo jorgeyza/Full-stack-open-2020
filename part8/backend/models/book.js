@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const schema = new mongoose.Schema({
+const bookSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -17,4 +17,13 @@ const schema = new mongoose.Schema({
   genres: [{ type: String }],
 });
 
-module.exports = mongoose.model('Book', schema);
+bookSchema.set('toObject', {
+  transform: (document, returnedObject) => {
+    const object = returnedObject;
+    object.id = returnedObject._id.toString();
+    delete object._id;
+    delete object.__v;
+  },
+});
+
+module.exports = mongoose.model('Book', bookSchema);

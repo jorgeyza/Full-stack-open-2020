@@ -3,18 +3,21 @@ const {
   gql,
   UserInputError,
   AuthenticationError,
+  PubSub,
 } = require('apollo-server');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const DataLoader = require('dataloader');
 const config = require('./utils/config');
 const Book = require('./models/book');
 const Author = require('./models/author');
 const User = require('./models/user');
 
 const { MONGODB_URI, JWT_SECRET } = config;
+const pubsub = new PubSub();
+mongoose.set('debug', true);
 
 console.log('connecting to', MONGODB_URI);
-
 mongoose
   .connect(MONGODB_URI, {
     useNewUrlParser: true,
@@ -31,27 +34,9 @@ mongoose
 
 let authors = [
   {
-    name: 'Robert Martin',
-    id: 'afa51ab0-344d-11e9-a414-719c6709cf3e',
-    born: 1952,
-  },
-  {
-    name: 'Martin Fowler',
-    id: 'afa5b6f0-344d-11e9-a414-719c6709cf3e',
-    born: 1963,
-  },
-  {
     name: 'Fyodor Dostoevsky',
     id: 'afa5b6f1-344d-11e9-a414-719c6709cf3e',
     born: 1821,
-  },
-  {
-    name: 'Joshua Kerievsky', // birthyear not known
-    id: 'afa5b6f2-344d-11e9-a414-719c6709cf3e',
-  },
-  {
-    name: 'Sandi Metz', // birthyear not known
-    id: 'afa5b6f3-344d-11e9-a414-719c6709cf3e',
   },
 ];
 
@@ -64,7 +49,7 @@ let books = [
     genres: ['classic', 'crime'],
   },
   {
-    title: 'The Demon ',
+    title: 'The Demon',
     published: 1872,
     author: 'Fyodor Dostoevsky',
     id: 'afa5de04-344d-11e9-a414-719c6709cf3e',
@@ -85,7 +70,7 @@ const typeDefs = gql`
     name: String!
     born: Int
     bookCount: Int
-    id: ID!
+    id: ID
   }
 
   type User {
@@ -117,36 +102,43 @@ const typeDefs = gql`
     createUser(username: String!, favoriteGenre: String!): User
     login(username: String!, password: String!): Token
   }
+
+  type Subscription {
+    bookAdded: Book!
+  }
 `;
 
 const resolvers = {
+  Book: {
+    author: async (root, args, { authorLoader }) =>
+      await authorLoader.load(root.author),
+  },
   Query: {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
-    allBooks: (root, args) => {
+    allBooks: async (root, args) => {
       if (!args.author && !args.genre) {
-        return Book.find({}).populate('author', {
-          name: 1,
-          born: 1,
-        });
+        const books = await Book.find({});
+        return books;
       }
 
       if (args.author || args.genre) {
-        return Book.find({
-          $or: [{ author: args.author }, { genres: { $in: args.genre } }],
-        }).populate('author', {
-          name: 1,
-          born: 1,
+        let authorId;
+        const author = await Author.findOne({ name: args.author });
+        author ? (authorId = author.id) : (authorId = null);
+
+        const books = await Book.find({
+          $or: [{ author: authorId || null }, { genres: { $in: args.genre } }],
         });
+        return books;
       }
     },
     allAuthors: () => Author.find({}),
     me: (root, args, { currentUser }) => currentUser,
   },
   Author: {
-    bookCount: async (root) => {
-      const searchedAuthor = await Author.findOne({ name: root.name });
-      return Book.find({ author: searchedAuthor }).countDocuments();
+    bookCount: async (root, args, { bookCountLoader }) => {
+      return bookCountLoader.load(root._id);
     },
   },
   Mutation: {
@@ -170,10 +162,11 @@ const resolvers = {
           const savedAuthor = await newAuthor.save();
           bookObj.author = savedAuthor;
         } else {
-          bookObj.author = authorExists;
+          bookObj.author = authorExists._id;
         }
         const newBook = new Book(bookObj);
         await newBook.save();
+        pubsub.publish('BOOK_ADDED', { bookAdded: newBook });
         return newBook;
       } catch (error) {
         throw new UserInputError(error.message, {
@@ -229,23 +222,56 @@ const resolvers = {
       return { value: jwt.sign(userForToken, JWT_SECRET) };
     },
   },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED']),
+    },
+  },
+};
+
+const batchAuthors = async (ids) => {
+  let authors = await Author.find({
+    _id: {
+      $in: ids,
+    },
+  });
+
+  const orderedAuthors = ids.map((id) =>
+    authors.find((author) => author._id.equals(id))
+  );
+  return orderedAuthors;
+};
+
+const batchBookCount = async (ids) => {
+  let books = await Book.find({});
+
+  const bookCounts = ids.map((id) => {
+    return books.filter((b) => b.author.equals(id)).length;
+  });
+
+  return bookCounts;
 };
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: async ({ req }) => {
+    let currentUser;
     const auth = req ? req.headers.authorization : null;
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
       const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET);
-
-      const currentUser = await User.findById(decodedToken.id);
-
-      return { currentUser };
+      currentUser = await User.findById(decodedToken.id);
     }
+
+    return {
+      currentUser: currentUser || null,
+      authorLoader: new DataLoader(batchAuthors),
+      bookCountLoader: new DataLoader(batchBookCount),
+    };
   },
 });
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`);
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`);
 });

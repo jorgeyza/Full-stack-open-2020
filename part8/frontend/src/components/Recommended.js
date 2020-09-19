@@ -32,7 +32,7 @@ const Recommended = () => {
 
   useEffect(() => {
     if (booksByGenreData) {
-      console.log(booksByGenreData);
+      console.log('Recommended -> booksByGenreData', booksByGenreData);
       setFilteredBooks(booksByGenreData.allBooks);
     }
   }, [booksByGenreData]);

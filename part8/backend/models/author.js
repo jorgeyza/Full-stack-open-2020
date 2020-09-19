@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const schema = new mongoose.Schema({
+const authorSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -12,4 +12,13 @@ const schema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Author', schema);
+authorSchema.set('toObject', {
+  transform: (document, returnedObject) => {
+    const object = returnedObject;
+    object.id = returnedObject._id.toString();
+    delete object._id;
+    delete object.__v;
+  },
+});
+
+module.exports = mongoose.model('Author', authorSchema);

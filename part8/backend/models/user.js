@@ -13,5 +13,14 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.set('toObject', {
+  transform: (document, returnedObject) => {
+    const object = returnedObject;
+    object.id = returnedObject._id.toString();
+    delete object._id;
+    delete object.__v;
+  },
+});
+
 userSchema.plugin(uniqueValidator);
 module.exports = mongoose.model('User', userSchema);
