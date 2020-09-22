@@ -66,6 +66,7 @@ const calculateExercises = (target: number, week: Array<number>): Result => {
       ratingDescription = 'You did great, keep on';
       break;
     default:
+      ratingDescription = 'Something went wrong';
       break;
   }
 
@@ -86,5 +87,3 @@ try {
 } catch (e) {
   console.log('Error, something bad happened, message: ', e.message);
 }
-
-// console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
