@@ -17,28 +17,31 @@ const parseArguments = (args: Array<string>): exerciseValues => {
   if (args.length < 4) throw new Error('Not enough arguments');
 
   let allNumbers;
-  const weekArray = [];
+  const dailyExercisesArray = [];
   for (let i = 3; i < args.length; i++) {
     allNumbers = true;
     allNumbers = !isNaN(Number(args[i])) && allNumbers;
-    weekArray.push(Number(args[i]));
+    dailyExercisesArray.push(Number(args[i]));
   }
 
   if (allNumbers) {
     return {
       value1: Number(args[2]),
-      value2: weekArray,
+      value2: dailyExercisesArray,
     };
   } else {
     throw new Error('Provided values were not numbers!');
   }
 };
 
-const calculateExercises = (target: number, week: Array<number>): Result => {
-  const periodLength = week.length;
-  const trainingDays = week.filter((day) => day !== 0).length;
+export const calculateExercises = (
+  target: number,
+  dailyExercises: Array<number>
+): Result => {
+  const periodLength = dailyExercises.length;
+  const trainingDays = dailyExercises.filter((day) => day !== 0).length;
   const average =
-    week.reduce((total, currentValue) => total + currentValue, 0) /
+    dailyExercises.reduce((total, currentValue) => total + currentValue, 0) /
     periodLength;
   const success = average >= target;
   let rating;
@@ -85,5 +88,5 @@ try {
   const { value1, value2 } = parseArguments(process.argv);
   console.log(calculateExercises(value1, value2));
 } catch (e) {
-  console.log('Error, something bad happened, message: ', e.message);
+  console.log('Error, something bad happened, message: ', (e as Error).message);
 }
