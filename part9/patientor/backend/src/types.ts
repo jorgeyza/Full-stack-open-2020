@@ -64,8 +64,23 @@ export interface Patient {
   entries: Entry[];
 }
 
+type DistributiveOmit<T, K extends keyof any> = T extends any
+  ? Omit<T, K>
+  : never;
+
 export type NewPatient = Omit<Patient, 'id'>;
 
 export type PatientIncomplete = Omit<Patient, 'ssn'>;
 
 export type PublicPatient = Omit<Patient, 'ssn' | 'entries'>;
+
+export type NewEntry = DistributiveOmit<Entry, 'id'>;
+
+export type NewHospitalEntry = Omit<HospitalEntry, 'id'>;
+
+export type NewOccupationalHealthCareEntry = Omit<
+  OccupationalHealthCareEntry,
+  'id'
+>;
+
+export type NewHealthCheckEntry = Omit<HealthCheckEntry, 'id'>;

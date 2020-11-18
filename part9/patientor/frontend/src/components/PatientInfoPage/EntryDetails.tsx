@@ -1,9 +1,9 @@
 import React from 'react';
-import { Entry } from '../types';
+import { Entry } from '../../types';
 import HealthCheckEntry from './Entries/HealthCheckEntry';
 import OccupationalHealthcareEntry from './Entries/OccupationalHealthcareEntry';
 import HospitalEntry from './Entries/HospitalEntry';
-import { useStateValue } from '../state';
+import { useStateValue } from '../../state';
 
 const assertNever = (value: never): never => {
   throw new Error(

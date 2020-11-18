@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Icon, Popup } from 'semantic-ui-react';
 import { SemanticICONS } from 'semantic-ui-react/dist/commonjs/generic';
-import { Diagnosis, OccupationalHealthCareEntry } from '../../types';
+import { Diagnosis, OccupationalHealthCareEntry } from '../../../types';
 
 const OccupationalHealthcare: React.FC<{
   entryData: OccupationalHealthCareEntry;
@@ -31,7 +31,7 @@ const OccupationalHealthcare: React.FC<{
               <p>Diagnoses:</p>
               <ul>
                 {entryData.diagnosisCodes?.map((code) => (
-                  <li>
+                  <li key={code}>
                     {code}:{' '}
                     {
                       diagnoses.find((diagnosis) => diagnosis.code === code)

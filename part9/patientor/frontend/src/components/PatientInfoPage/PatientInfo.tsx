@@ -1,14 +1,22 @@
 import React, { useEffect } from 'react';
-import { Patient, Diagnosis } from '../types';
-import { apiBaseUrl } from '../constants';
-import { useStateValue, setChosenPatient, setDiagnoses } from '../state/';
-import {} from '../state/reducer';
-import EntryDetails from './EntryDetails';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { Icon, Popup } from 'semantic-ui-react';
+import { Button, Icon, Popup } from 'semantic-ui-react';
 import { SemanticICONS } from 'semantic-ui-react/dist/commonjs/generic';
 import { Dimmer, Loader, Segment } from 'semantic-ui-react';
+
+import { Patient, Diagnosis, Entry } from '../../types';
+import { apiBaseUrl } from '../../constants';
+import {
+  useStateValue,
+  setChosenPatient,
+  setDiagnoses,
+  addEntry,
+} from '../../state';
+
+import EntryDetails from './EntryDetails';
+import AddEntryModal from '../AddEntryModal';
+import { EntryFormValues } from '../AddEntryModal/HealthCheckEntryForm';
 
 const InfoLoader = () => (
   <Segment>
@@ -21,6 +29,9 @@ const InfoLoader = () => (
 const PatientInfo: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [{ chosenPatient }, dispatch] = useStateValue();
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | undefined>();
+  const [entryType, setEntryType] = React.useState<string>('HealthCheckEntry');
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -66,6 +77,27 @@ const PatientInfo: React.FC = () => {
       break;
   }
 
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      const { data: newEntry } = await axios.post<Entry>(
+        `${apiBaseUrl}/patients/${id}/entries`,
+        values
+      );
+      dispatch(addEntry(newEntry));
+      closeModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
+
   if (Object.keys(chosenPatient).length === 0) {
     return <InfoLoader />;
   }
@@ -94,6 +126,21 @@ const PatientInfo: React.FC = () => {
         ) : (
           <h3>No entries</h3>
         )}
+        <AddEntryModal
+          modalOpen={modalOpen}
+          onSubmit={submitNewEntry}
+          error={error}
+          onClose={closeModal}
+          type={entryType}
+        />
+        <Button onClick={() => openModal()}>Add New Entry</Button>
+        <select onChange={(e) => setEntryType(e.target.value)}>
+          <option value="HealthCheckEntry">HealthCheckEntry</option>
+          <option value="HospitalEntry">HospitalEntry</option>
+          <option value="OccupationalHealthcareEntry">
+            OccupationalHealthcareEntry
+          </option>
+        </select>
       </div>
     </div>
   );

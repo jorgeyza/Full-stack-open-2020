@@ -3,13 +3,13 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Container, Table, Button } from 'semantic-ui-react';
 
-import { PatientFormValues } from '../AddPatientModal/AddPatientForm';
-import AddPatientModal from '../AddPatientModal';
-import { Patient } from '../types';
-import { apiBaseUrl } from '../constants';
-import HealthRatingBar from '../components/HealthRatingBar';
-import { useStateValue } from '../state';
-import { addPatient } from '../state/reducer';
+import { PatientFormValues } from './AddPatientModal/AddPatientForm';
+import AddPatientModal from './AddPatientModal';
+import { Patient } from '../../types';
+import { apiBaseUrl } from '../../constants';
+import HealthRatingBar from './HealthRatingBar';
+import { useStateValue } from '../../state';
+import { addPatient } from '../../state/reducer';
 
 const PatientListPage: React.FC = () => {
   const [{ patients }, dispatch] = useStateValue();
@@ -37,7 +37,6 @@ const PatientListPage: React.FC = () => {
       setError(e.response.data.error);
     }
   };
-  console.log('patients', patients);
 
   return (
     <div className="App">

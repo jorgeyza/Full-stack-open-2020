@@ -1,5 +1,6 @@
 import { State } from './state';
-import { Diagnosis, Patient } from '../types';
+import { Diagnosis, Patient, Entry } from '../types';
+import cloneDeep from 'lodash.clonedeep';
 
 export type Action =
   | {
@@ -17,6 +18,10 @@ export type Action =
   | {
       type: 'SET_DIAGNOSES';
       payload: Diagnosis[];
+    }
+  | {
+      type: 'ADD_ENTRY';
+      payload: Entry;
     };
 
 export const reducer = (state: State, action: Action): State => {
@@ -41,16 +46,19 @@ export const reducer = (state: State, action: Action): State => {
         },
       };
     case 'SET_CHOSEN_PATIENT':
-      console.log('SET_CHOSEN_PATIENT payload is: ', action.payload);
+      const clonedChosenPatient = cloneDeep(action.payload);
       return {
         ...state,
-        chosenPatient: action.payload,
+        chosenPatient: { ...clonedChosenPatient },
       };
     case 'SET_DIAGNOSES':
       return {
         ...state,
         diagnoses: [...action.payload],
       };
+    case 'ADD_ENTRY':
+      state.chosenPatient.entries.push(action.payload);
+      return state;
     default:
       return state;
   }
@@ -59,6 +67,7 @@ export const reducer = (state: State, action: Action): State => {
 export const setPatientList = (list: Patient[]): Action => {
   return { type: 'SET_PATIENT_LIST', payload: list };
 };
+
 export const addPatient = (patient: Patient): Action => {
   return { type: 'ADD_PATIENT', payload: patient };
 };
@@ -69,4 +78,8 @@ export const setChosenPatient = (patient: Patient): Action => {
 
 export const setDiagnoses = (diagnoses: Diagnosis[]): Action => {
   return { type: 'SET_DIAGNOSES', payload: diagnoses };
+};
+
+export const addEntry = (entry: Entry): Action => {
+  return { type: 'ADD_ENTRY', payload: entry };
 };

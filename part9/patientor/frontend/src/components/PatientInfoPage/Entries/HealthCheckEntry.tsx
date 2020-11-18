@@ -4,7 +4,7 @@ import {
   SemanticCOLORS,
   SemanticICONS,
 } from 'semantic-ui-react/dist/commonjs/generic';
-import { Diagnosis, HealthCheckEntry } from '../../types';
+import { Diagnosis, HealthCheckEntry } from '../../../types';
 
 const HealthCheck: React.FC<{
   entryData: HealthCheckEntry;
@@ -62,7 +62,7 @@ const HealthCheck: React.FC<{
               <p>Diagnoses:</p>
               <ul>
                 {entryData.diagnosisCodes?.map((code) => (
-                  <li>
+                  <li key={code}>
                     {code}:{' '}
                     {
                       diagnoses.find((diagnosis) => diagnosis.code === code)
